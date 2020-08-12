@@ -1,7 +1,6 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 
-
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog),
@@ -31,3 +30,4 @@ void Dialog::displayMessage()
 {
     ui->label->setText(client.messageCur.data());
 }
+
