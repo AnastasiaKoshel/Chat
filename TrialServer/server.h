@@ -7,34 +7,34 @@
 #include <QtNetwork>
 #include <QtCore>
 #include "string"
+#include "vector"
+#include <QSet>
+
 QT_BEGIN_NAMESPACE
 class QLabel;
 class QTcpServer;
 QT_END_NAMESPACE
 
 //! [0]
-class Server : public QDialog
+class Server : public QTcpServer
 {
     Q_OBJECT
 
 public:
-    explicit Server(QWidget *parent = nullptr);
+    explicit Server(QObject *parent = nullptr);
     bool initServer();
    void initClient();
    std::string messageCur;
+
+private slots:
     void processMessage();
 
 signals:
-    void processMessageSignal();
-public slots:
-    void sendMessage(std::string message);
-
+    void processMessageSignal(std::string s);
 
 private:
     QTcpServer *tcpServer = nullptr;
-    QTcpSocket* client;
-    QDataStream in;
-
+    QSet<QTcpSocket*> clients;
 
 };
 //! [0]

@@ -31,3 +31,4 @@ void Dialog::displayMessage()
     ui->label->setText(client.messageCur.data());
 }
 
+

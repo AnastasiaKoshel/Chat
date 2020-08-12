@@ -14,29 +14,29 @@ class QTcpSocket;
 QT_END_NAMESPACE
 
 //! [0]
-class Client : public QDialog
+class Client : public QObject
 {
     Q_OBJECT
 
 public:
-    explicit Client(QWidget *parent = nullptr);
+    explicit Client(QObject  *parent = nullptr);
     void sendMessage(std::string message);
     void processMessage();
     std::string messageCur;
 
 signals:
     void processMessageSignal();
+    void disconnected();
 
 public slots:
-
+    void connectToServer();
     void displayError(QAbstractSocket::SocketError socketError);
 
 private:
     int portLineEdit = 1234;
 
     QTcpSocket *tcpSocket = nullptr;
-    QDataStream in;
-    QString currentFortune;
+    bool isLoggedIn = false;
 
 };
 //! [0]

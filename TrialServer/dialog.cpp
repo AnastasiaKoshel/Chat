@@ -25,24 +25,14 @@ void Dialog::on_connectButton_clicked()
     bool serverInitSuccess = server.initServer();
     if(serverInitSuccess)
         ui->label->setText("Server init succes");
-     bool success = connect(&server, SIGNAL(processMessageSignal()), this, SLOT(displayMessage()));
+     bool success = connect(&server, SIGNAL(processMessageSignal(std::string)), this, SLOT(displayMessage(std::string)));
      if(!success)
 ui->label->setText("Faaaail");
 
 }
 
-void Dialog::on_sendMessage_clicked()
-{
-    QString message = ui->textEdit->toPlainText();
-    server.sendMessage(message.toStdString());
-}
 
-
-void Dialog::on_receiveButton_clicked()
+void Dialog::displayMessage(std::string s)
 {
-    ui->label->setText(server.messageCur.data());
-}
-void Dialog::displayMessage()
-{
-     ui->label->setText(server.messageCur.data());
+     ui->label->setText(s.data());
 }
