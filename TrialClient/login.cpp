@@ -22,4 +22,7 @@ void Login::on_loginButton_clicked()
     QString password = ui->loginLine->text();
     QString messageForServer = "Login:"+login+"Password:"+password;
     client.sendMessage(messageForServer.toStdString());
+
+    dialog.show();
+    this->close();
 }

@@ -32,3 +32,7 @@ void Dialog::displayMessage()
 }
 
 
+void Dialog::on_connectButton_clicked()
+{
+    client.connectToServer();
+}
