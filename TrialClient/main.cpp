@@ -5,7 +5,7 @@
 int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
-    QApplication::setApplicationDisplayName(Client::tr("Fortune Client"));
+    QApplication::setApplicationDisplayName(Client::tr("Client"));
     Dialog dialog;
     dialog.show();
     return app.exec();

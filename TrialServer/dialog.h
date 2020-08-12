@@ -25,10 +25,7 @@ private slots:
 
     void on_connectButton_clicked();
 
-    void on_sendMessage_clicked();
-
-    void on_receiveButton_clicked();
-    void displayMessage();
+    void displayMessage(std::string s);
 
 private:
     Ui::Dialog *ui;

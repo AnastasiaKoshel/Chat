@@ -23,6 +23,8 @@ private slots:
 
     void displayMessage();
 
+    void on_connectButton_clicked();
+
 private:
     Ui::Dialog *ui;
 };

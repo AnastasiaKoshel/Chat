@@ -31,3 +31,8 @@ void Dialog::displayMessage()
 {
     ui->label->setText(client.messageCur.data());
 }
+
+void Dialog::on_connectButton_clicked()
+{
+    client.connectToServer();
+}
