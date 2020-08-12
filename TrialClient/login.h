@@ -14,9 +14,11 @@ class Login: public QDialog
     Q_OBJECT
 
 public:
-    explicit Login(QWidget *parent = nullptr);
+    explicit Login(Client *cl, QWidget *parent = nullptr);
     ~Login();
-    Client client;
+
+signals:
+    void logInSuccess();
 
 private slots:
 
@@ -24,7 +26,8 @@ private slots:
 
 private:
     Ui::Login *ui;
-    Dialog dialog;
+    Client *client;
+
 };
 
 #endif // LOGIN_H
