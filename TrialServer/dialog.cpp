@@ -34,5 +34,5 @@ ui->label->setText("Faaaail");
 
 void Dialog::displayMessage(std::string s)
 {
-     ui->label->setText(s.data());
+     ui->label->setText(ui->label->text() + '\n' +s.data());
 }

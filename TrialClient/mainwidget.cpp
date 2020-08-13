@@ -12,7 +12,7 @@ MainWidget::MainWidget(QWidget *parent) :
     client.connectToServer();
     ui->setupUi(this);
     connect(login, SIGNAL(logInSuccess()), this, SLOT(showDialog()));
-    connect(&client, SIGNAL(processMessageSignal()), this, SLOT(displayMessage()));
+   // connect(&client, SIGNAL(processMessageSignal()), this, SLOT(displayMessage()));
 }
 
 MainWidget::~MainWidget()
