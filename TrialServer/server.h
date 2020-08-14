@@ -32,8 +32,7 @@ class Server : public QTcpServer
 public:
     explicit Server(QObject *parent = nullptr);
     bool initServer();
-   void initClient();
-   std::string messageCur;
+    void initClient();
 
 private slots:
     void processMessage();

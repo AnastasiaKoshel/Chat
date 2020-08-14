@@ -27,7 +27,7 @@ void Dialog::on_connectButton_clicked()
         ui->label->setText("Server init succes");
      bool success = connect(&server, SIGNAL(processMessageSignal(std::string)), this, SLOT(displayMessage(std::string)));
      if(!success)
-ui->label->setText("Faaaail");
+        ui->label->setText("failed connecting to displayMessage");
 
 }
 

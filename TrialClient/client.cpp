@@ -6,8 +6,7 @@
 
 //! [0]
 Client::Client(QObject *parent)
-: QObject(parent)
-    , portLineEdit(1234)
+    : QObject(parent)
     , tcpSocket(new QTcpSocket(this))
 {
     connect(tcpSocket, &QTcpSocket::disconnected, this, &Client::disconnected);
@@ -27,7 +26,7 @@ void Client::sendMessage(std::string message)
     tcpSocket->write(message.data());
 }
 
-
+//errors will be handeled later
 void Client::displayError(QAbstractSocket::SocketError socketError)
 {
     switch (socketError) {

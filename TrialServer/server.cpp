@@ -25,7 +25,6 @@ bool Server::initServer()
 
 void Server::initClient()
 {
-    //QTcpSocket *socket =
     ClientData* client = new ClientData();
     client->clientSocket = tcpServer->nextPendingConnection();
     clients.insert(client);

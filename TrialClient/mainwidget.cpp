@@ -12,7 +12,6 @@ MainWidget::MainWidget(QWidget *parent) :
     client.connectToServer();
     ui->setupUi(this);
     connect(login, SIGNAL(logInSuccess()), this, SLOT(showDialog()));
-   // connect(&client, SIGNAL(processMessageSignal()), this, SLOT(displayMessage()));
 }
 
 MainWidget::~MainWidget()
@@ -29,7 +28,7 @@ void MainWidget::on_mainLogInButton_clicked()
 
 void MainWidget::showDialog()
 {
-    qDebug()<<"in Show Dialog";
+    qDebug()<<"Entered Show Dialog";
     dialog->show();
     login->close();
 }

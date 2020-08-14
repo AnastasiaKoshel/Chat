@@ -15,8 +15,6 @@ Dialog::~Dialog()
     delete ui;
 }
 
-
-
 void Dialog::on_sendButton_clicked()
 {
     QString message = ui->textEdit->toPlainText();
