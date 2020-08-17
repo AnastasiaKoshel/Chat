@@ -20,7 +20,8 @@ class Client : public QObject
 
 public:
     explicit Client(QObject  *parent = nullptr);
-    void sendMessage(std::string message);
+    void sendTextMessage(std::string text);
+    void sendLoginMessage(std::string login, std::string password);
     void processMessage();
     std::string messageCur;
 

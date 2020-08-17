@@ -31,52 +31,63 @@ void Server::initClient()
 
     emit processMessageSignal("New client from:" + std::to_string(client->clientSocket->socketDescriptor()));
     connect(client->clientSocket, &QIODevice::readyRead,
-            this, &Server::processMessage);
+            this, &Server::jsonReceived);
 
     connect(client->clientSocket, &QAbstractSocket::disconnected,
             client->clientSocket, &QObject::deleteLater);
 }
 
-void Server::processMessage()
+
+
+void Server::jsonReceived()
 {
     QTcpSocket *client = (QTcpSocket*)sender();
-    char * message = new char[100];
-    client->read(message, 100);
-    std::string messageString(message);
-    qDebug()<<messageString.data();
-    if(messageString[0] == 'L')
-    {
-        int startLogin = messageString.find("Login:");
-        int startPassword = messageString.find("Password:");
-        qDebug()<<"startPass"<<startPassword;
-        //magic numbers
-        std::string log = messageString.substr(startLogin+5, startPassword-startLogin-5);
-        std::string pass = messageString.substr(startPassword+9);
-        foreach(ClientData *clientCur, clients)
-        {
-            qDebug()<<clientCur->clientSocket->socketDescriptor();
-            if(clientCur->clientSocket->socketDescriptor()==client->socketDescriptor())
-            {
-                clientCur->login =log;
-                clientCur->password = pass;
+    QByteArray jsonData = client->read(1000);
+    QJsonParseError parseError;
 
-                emit processMessageSignal("Login: " + log + "  \nPassword: " + pass);
-            }
-        }
+    const QJsonDocument json = QJsonDocument::fromJson(jsonData, &parseError);
+    const QJsonValue type = json.object().value("type");
+    qDebug()<<"jSonType "<<type;
+    if(type == "login")
+        processLogin(json.object(), client);
+    else {
+        processMessage(json.object(), client);
     }
-    else
+
+}
+
+void Server::processLogin(const QJsonObject& json,  QTcpSocket* sender)
+{
+    qDebug()<<"Login json";
+    const QJsonValue login = json.value("login");
+    const QJsonValue password = json.value("password");
+
+    foreach(ClientData *clientCur, clients)
     {
-        messageString.erase(0,1);
-        foreach(ClientData* clientCur, clients)
+        qDebug()<<clientCur->clientSocket->socketDescriptor();
+        if(clientCur->clientSocket->socketDescriptor()==sender->socketDescriptor())
         {
-            if(clientCur->clientSocket->socketDescriptor()!=client->socketDescriptor())
-            {
-                clientCur->clientSocket->write(messageString.c_str());
-                emit processMessageSignal(message);
-            }
+            clientCur->login = login.toString().toStdString();
+            clientCur->password = password.toString().toStdString();
+
+            emit processMessageSignal("Login: " + clientCur->login + "  \nPassword: " + clientCur->password);
         }
     }
 
+}
+void Server::processMessage(const QJsonObject& json, QTcpSocket* sender)
+{
+ qDebug()<<"Message json";
+    const QJsonValue messageText = json.value("value");
+    const std::string message = messageText.toString().toStdString();
+    foreach(ClientData* clientCur, clients)
+    {
+        if(clientCur->clientSocket->socketDescriptor()!=sender->socketDescriptor())
+        {
+            clientCur->clientSocket->write(message.c_str());
+            emit processMessageSignal(message);
+        }
+    }
 
 }
 
