@@ -1,14 +1,13 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 
-
-Dialog::Dialog(QWidget *parent) :
+Dialog::Dialog(Client *cl, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog),
-    client(new Client())
+    client(cl)
 {
     ui->setupUi(this);
-    connect(&client, SIGNAL(processMessageSignal()), this, SLOT(displayMessage()));
+    connect(client, SIGNAL(processMessageSignal()), this, SLOT(displayMessage()));
 }
 
 Dialog::~Dialog()
@@ -16,12 +15,10 @@ Dialog::~Dialog()
     delete ui;
 }
 
-
-
 void Dialog::on_sendButton_clicked()
 {
     QString message = ui->textEdit->toPlainText();
-    client.sendMessage(message.toStdString());
+    client->sendMessage("M"+message.toStdString());
     message = ui->labelYourMessage->text() + '\n'+ message;
     ui->labelYourMessage->setText(message);
     ui->textEdit->clear();
@@ -29,10 +26,6 @@ void Dialog::on_sendButton_clicked()
 
 void Dialog::displayMessage()
 {
-    ui->label->setText(client.messageCur.data());
+    ui->label->setText(client->messageCur.c_str());
 }
 
-void Dialog::on_connectButton_clicked()
-{
-    client.connectToServer();
-}

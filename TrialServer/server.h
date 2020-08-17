@@ -15,6 +15,15 @@ class QLabel;
 class QTcpServer;
 QT_END_NAMESPACE
 
+
+
+struct ClientData{
+
+    QTcpSocket* clientSocket;
+    std::string password;
+    std::string login;
+};
+
 //! [0]
 class Server : public QTcpServer
 {
@@ -23,8 +32,7 @@ class Server : public QTcpServer
 public:
     explicit Server(QObject *parent = nullptr);
     bool initServer();
-   void initClient();
-   std::string messageCur;
+    void initClient();
 
 private slots:
     void processMessage();
@@ -34,9 +42,11 @@ signals:
 
 private:
     QTcpServer *tcpServer = nullptr;
-    QSet<QTcpSocket*> clients;
+    QSet<ClientData*> clients;
 
 };
+
+
 //! [0]
 
 #endif

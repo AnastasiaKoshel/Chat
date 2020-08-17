@@ -25,15 +25,16 @@ bool Server::initServer()
 
 void Server::initClient()
 {
-    QTcpSocket *client =  tcpServer->nextPendingConnection();
+    ClientData* client = new ClientData();
+    client->clientSocket = tcpServer->nextPendingConnection();
     clients.insert(client);
 
-    emit processMessageSignal("New client from:" + client->peerAddress().toString().toStdString());
-    connect(client, &QIODevice::readyRead,
+    emit processMessageSignal("New client from:" + std::to_string(client->clientSocket->socketDescriptor()));
+    connect(client->clientSocket, &QIODevice::readyRead,
             this, &Server::processMessage);
 
-    connect(client, &QAbstractSocket::disconnected,
-            client, &QObject::deleteLater);
+    connect(client->clientSocket, &QAbstractSocket::disconnected,
+            client->clientSocket, &QObject::deleteLater);
 }
 
 void Server::processMessage()
@@ -41,13 +42,41 @@ void Server::processMessage()
     QTcpSocket *client = (QTcpSocket*)sender();
     char * message = new char[100];
     client->read(message, 100);
-
-    foreach(QTcpSocket *clientCur, clients)
+    std::string messageString(message);
+    qDebug()<<messageString.data();
+    if(messageString[0] == 'L')
     {
-        if(clientCur->socketDescriptor()!=client->socketDescriptor())
-            clientCur->write(message);
+        int startLogin = messageString.find("Login:");
+        int startPassword = messageString.find("Password:");
+        qDebug()<<"startPass"<<startPassword;
+        //magic numbers
+        std::string log = messageString.substr(startLogin+5, startPassword-startLogin-5);
+        std::string pass = messageString.substr(startPassword+9);
+        foreach(ClientData *clientCur, clients)
+        {
+            qDebug()<<clientCur->clientSocket->socketDescriptor();
+            if(clientCur->clientSocket->socketDescriptor()==client->socketDescriptor())
+            {
+                clientCur->login =log;
+                clientCur->password = pass;
+
+                emit processMessageSignal("Login: " + log + "  \nPassword: " + pass);
+            }
+        }
+    }
+    else
+    {
+        messageString.erase(0,1);
+        foreach(ClientData* clientCur, clients)
+        {
+            if(clientCur->clientSocket->socketDescriptor()!=client->socketDescriptor())
+            {
+                clientCur->clientSocket->write(messageString.c_str());
+                emit processMessageSignal(message);
+            }
+        }
     }
 
-    emit processMessageSignal(message);
+
 }
 

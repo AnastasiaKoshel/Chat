@@ -33,8 +33,6 @@ public slots:
     void displayError(QAbstractSocket::SocketError socketError);
 
 private:
-    int portLineEdit = 1234;
-
     QTcpSocket *tcpSocket = nullptr;
     bool isLoggedIn = false;
 

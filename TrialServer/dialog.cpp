@@ -27,12 +27,12 @@ void Dialog::on_connectButton_clicked()
         ui->label->setText("Server init succes");
      bool success = connect(&server, SIGNAL(processMessageSignal(std::string)), this, SLOT(displayMessage(std::string)));
      if(!success)
-ui->label->setText("Faaaail");
+        ui->label->setText("failed connecting to displayMessage");
 
 }
 
 
 void Dialog::displayMessage(std::string s)
 {
-     ui->label->setText(s.data());
+     ui->label->setText(ui->label->text() + '\n' +s.data());
 }
