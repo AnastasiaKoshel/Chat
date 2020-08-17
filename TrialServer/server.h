@@ -35,12 +35,15 @@ public:
     void initClient();
 
 private slots:
-    void processMessage();
+    void jsonReceived();
 
 signals:
     void processMessageSignal(std::string s);
 
 private:
+    void messageReceived(const QJsonObject& json);
+    void processLogin(const QJsonObject& json,  QTcpSocket* sender);
+    void processMessage(const QJsonObject& json, QTcpSocket* sender);
     QTcpServer *tcpServer = nullptr;
     QSet<ClientData*> clients;
 

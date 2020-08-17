@@ -19,8 +19,7 @@ void Login::on_loginButton_clicked()
 {
     QString login = ui->loginLine->text();
     QString password = ui->passwordLine->text();
-    QString messageForServer = "LLogin:"+login+"Password:"+password;
-    client->sendMessage(messageForServer.toStdString());
 
+    client->sendLoginMessage(login.toStdString(), password.toStdString());
     emit logInSuccess();
 }

@@ -20,10 +20,29 @@ void Client::connectToServer()
     qDebug() << "Connect to Server";
 }
 
-void Client::sendMessage(std::string message)
+void Client::sendTextMessage(std::string text)
 {
     qDebug() << "Send message";
-    tcpSocket->write(message.c_str(),100);
+
+    QJsonObject messageJson;
+    messageJson["type"] = "message";
+    messageJson["value"] = text.c_str();
+
+    const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
+    tcpSocket->write(jsonData);
+}
+
+void Client::sendLoginMessage(std::string login, std::string password)
+{
+    qDebug() << "Send message";
+
+    QJsonObject messageJson;
+    messageJson["type"] = "login";
+    messageJson["login"] = login.c_str();
+    messageJson["password"] = password.c_str();
+
+    const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
+    tcpSocket->write(jsonData);
 }
 
 //errors will be handeled later

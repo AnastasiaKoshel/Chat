@@ -18,7 +18,7 @@ Dialog::~Dialog()
 void Dialog::on_sendButton_clicked()
 {
     QString message = ui->textEdit->toPlainText();
-    client->sendMessage("M"+message.toStdString());
+    client->sendTextMessage(message.toStdString());
     message = ui->labelYourMessage->text() + '\n'+ message;
     ui->labelYourMessage->setText(message);
     ui->textEdit->clear();
