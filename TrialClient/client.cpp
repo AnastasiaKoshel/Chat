@@ -23,7 +23,7 @@ void Client::connectToServer()
 void Client::sendMessage(std::string message)
 {
     qDebug() << "Send message";
-    tcpSocket->write(message.data());
+    tcpSocket->write(message.c_str(),100);
 }
 
 //errors will be handeled later
@@ -37,9 +37,11 @@ void Client::displayError(QAbstractSocket::SocketError socketError)
 
 void Client::processMessage()
 {
+    //vector<char>
     char * message = new char[100];
-    tcpSocket->read(message, 100);
-    std::string res(message);
+    const auto len = tcpSocket->read(message, 100);
+    std::string res(message);//, message + len);
+    delete[] message;
     res+='\n';
     messageCur += res;
     emit processMessageSignal();

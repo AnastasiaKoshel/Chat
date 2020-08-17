@@ -49,6 +49,7 @@ void Server::processMessage()
         int startLogin = messageString.find("Login:");
         int startPassword = messageString.find("Password:");
         qDebug()<<"startPass"<<startPassword;
+        //magic numbers
         std::string log = messageString.substr(startLogin+5, startPassword-startLogin-5);
         std::string pass = messageString.substr(startPassword+9);
         foreach(ClientData *clientCur, clients)
@@ -70,7 +71,7 @@ void Server::processMessage()
         {
             if(clientCur->clientSocket->socketDescriptor()!=client->socketDescriptor())
             {
-                clientCur->clientSocket->write(messageString.data());
+                clientCur->clientSocket->write(messageString.c_str());
                 emit processMessageSignal(message);
             }
         }

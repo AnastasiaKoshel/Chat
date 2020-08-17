@@ -26,6 +26,6 @@ void Dialog::on_sendButton_clicked()
 
 void Dialog::displayMessage()
 {
-    ui->label->setText(client->messageCur.data());
+    ui->label->setText(client->messageCur.c_str());
 }
 
