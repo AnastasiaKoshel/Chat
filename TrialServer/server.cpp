@@ -4,6 +4,7 @@
 #include "dialog.h"
 #include "server.h"
 
+
 Server::Server(QObject *parent)
     : QTcpServer(parent)
 {
@@ -16,6 +17,9 @@ bool Server::initServer()
     bool success = tcpServer->listen(QHostAddress::Any, 1234);
 
     connect(tcpServer, &QTcpServer::newConnection, this, &Server::initClient);
+
+    db = new DBManager();
+
 
     if (!success) {
         return false;
@@ -50,10 +54,12 @@ void Server::jsonReceived()
     qDebug()<<"jSonType "<<type;
     if(type == "login")
         processLogin(json.object(), client);
-    else {
+    else if(type == "newAccount"){
+        processNewAccount(json.object(), client);
+    }
+    else{
         processMessage(json.object(), client);
     }
-
 }
 
 void Server::processLogin(const QJsonObject& json,  QTcpSocket* sender)
@@ -61,30 +67,65 @@ void Server::processLogin(const QJsonObject& json,  QTcpSocket* sender)
     qDebug()<<"Login json";
     const QJsonValue login = json.value("login");
     const QJsonValue password = json.value("password");
+    bool ifLoginMatchPassword =
+            db->loginAndPasswordMatch(login.toString().toStdString(), password.toString().toStdString());
 
-    foreach(ClientData *clientCur, clients)
+    QJsonObject messageJson;
+    messageJson["type"] = "login";
+    if(ifLoginMatchPassword)
+        messageJson["status"] = "Success";
+    else
+        messageJson["status"] = "Fail";
+
+    const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
+    sender->write(jsonData);
+
+    emit processMessageSignal("Login: " + login.toString().toStdString() + "  \nPassword: " + password.toString().toStdString());
+
+}
+
+
+void Server::processNewAccount(const QJsonObject& json,  QTcpSocket* sender)
+{
+    qDebug()<<"New Account json";
+    const QJsonValue login = json.value("login");
+    const QJsonValue password = json.value("password");
+    bool ifLoginExists = db->loginPresent(login.toString().toStdString());
+
+    QJsonObject messageJson;
+    messageJson["type"] = "newAccount";
+    if(ifLoginExists)
     {
-        qDebug()<<clientCur->clientSocket->socketDescriptor();
-        if(clientCur->clientSocket->socketDescriptor()==sender->socketDescriptor())
-        {
-            clientCur->login = login.toString().toStdString();
-            clientCur->password = password.toString().toStdString();
-
-            emit processMessageSignal("Login: " + clientCur->login + "  \nPassword: " + clientCur->password);
-        }
+       messageJson["status"] = "Fail";
     }
+    else
+    {
+       db->addClient(login.toString().toStdString(), password.toString().toStdString());
+       messageJson["status"] = "Success";
+       emit processMessageSignal("New Account has been created");
+    }
+
+
+    const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
+    sender->write(jsonData);
 
 }
 void Server::processMessage(const QJsonObject& json, QTcpSocket* sender)
 {
- qDebug()<<"Message json";
+    qDebug()<<"Message json";
     const QJsonValue messageText = json.value("value");
     const std::string message = messageText.toString().toStdString();
+    QJsonObject messageJson;
+    messageJson["type"] = "message";
+    messageJson["value"] = message.c_str();
+    const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
+
+    const int recipient = json.value("recipientID").toInt();
     foreach(ClientData* clientCur, clients)
     {
         if(clientCur->clientSocket->socketDescriptor()!=sender->socketDescriptor())
         {
-            clientCur->clientSocket->write(message.c_str());
+            clientCur->clientSocket->write(jsonData);
             emit processMessageSignal(message);
         }
     }

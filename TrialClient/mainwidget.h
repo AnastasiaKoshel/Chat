@@ -1,6 +1,7 @@
 #ifndef MAINWIDGET_H
 #define MAINWIDGET_H
 
+#include "newaccount.h"
 #include "login.h"
 #include "dialog.h"
 #include "client.h"
@@ -24,10 +25,13 @@ private slots:
     void on_mainLogInButton_clicked();
     void showDialog();
 
+    void on_newAccountButton_clicked();
+
 private:
     Ui::MainWidget *ui;
     Dialog *dialog;
     Login *login;
+    NewAccount *newAccount;
 };
 
 #endif // MAINWIDGET_H

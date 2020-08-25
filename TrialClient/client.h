@@ -5,6 +5,7 @@
 #include <QDialog>
 #include <QTcpSocket>
 #include <string>
+#include <vector>
 QT_BEGIN_NAMESPACE
 class QComboBox;
 class QLabel;
@@ -20,14 +21,20 @@ class Client : public QObject
 
 public:
     explicit Client(QObject  *parent = nullptr);
-    void sendTextMessage(std::string text);
+    void sendTextMessage(std::string text, int recipientID);
     void sendLoginMessage(std::string login, std::string password);
+    void sendNewAccountMessage(std::string login, std::string password);
     void processMessage();
+    void processJson();
     std::string messageCur;
+    std::vector<std::string> contactsList;
+    int currentChatID;
 
 signals:
     void processMessageSignal();
     void disconnected();
+    void loginJsonSignal(std::string status);
+    void newAccountSignal(std::string status);
 
 public slots:
     void connectToServer();
@@ -36,6 +43,7 @@ public slots:
 private:
     QTcpSocket *tcpSocket = nullptr;
     bool isLoggedIn = false;
+
 
 };
 //! [0]
