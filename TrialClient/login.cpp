@@ -8,7 +8,7 @@ Login::Login(Client *cl, QWidget *parent) :
     client(cl)
 {
     ui->setupUi(this);
-    connect(client, SIGNAL(loginJsonSignal()), this, SLOT(loginSignalReceived()));
+    connect(client, SIGNAL(loginJsonSignal(std::string)), this, SLOT(loginSignalReceived(std::string)));
 }
 
 Login::~Login()

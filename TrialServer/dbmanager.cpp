@@ -52,8 +52,13 @@ bool DBManager::printAll()
 bool DBManager::loginPresent(std::string login)
 {
     QSqlQuery query;
-    query.prepare("SELECT* FROM clientData WHERE login = (:login)");
+    query.prepare("SELECT * FROM clientData WHERE login = (:login)");
     query.bindValue(":login", login.c_str());
+    if( !query.exec() )
+    {
+        qDebug() << "Error getting user info from DB";
+        return false;
+    }
     while(query.next())
     {
         qDebug() << "Login: " << query.value(0).toString();
@@ -66,8 +71,13 @@ bool DBManager::loginPresent(std::string login)
 bool DBManager::loginAndPasswordMatch(std::string login, std::string password)
 {
     QSqlQuery query;
-    query.prepare("SELECT* FROM clientData WHERE login = (:login)");
+    query.prepare("SELECT * FROM clientData WHERE login = (:login)");
     query.bindValue(":login", login.c_str());
+    if( !query.exec() )
+    {
+        qDebug() << "Error getting user info from DB";
+        return false;
+    }
     while(query.next())
     {
         qDebug() << "Login from DB: " << query.value(1).toString()<< " Login income: "<<login.c_str();

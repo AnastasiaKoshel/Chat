@@ -13,7 +13,7 @@ MainWidget::MainWidget(QWidget *parent) :
     client.connectToServer();
     ui->setupUi(this);
     connect(login, SIGNAL(logInSuccess()), this, SLOT(showDialog()));
-    connect(login, SIGNAL(createNewAccountSuccess()), this, SLOT(showDialog()));
+    connect(newAccount, SIGNAL(createNewAccountSuccess()), this, SLOT(showDialog()));
 }
 
 MainWidget::~MainWidget()
@@ -33,6 +33,7 @@ void MainWidget::showDialog()
     qDebug()<<"Entered Show Dialog";
     dialog->show();
     login->close();
+    newAccount->close();
 }
 
 void MainWidget::on_newAccountButton_clicked()
