@@ -46,6 +46,7 @@ private:
     void processLogin(const QJsonObject& json,  QTcpSocket* sender);
     void processNewAccount(const QJsonObject& json,  QTcpSocket* sender);
     void processMessage(const QJsonObject& json, QTcpSocket* sender);
+    void sendUsersList(QTcpSocket* sender);
     QTcpServer *tcpServer = nullptr;
     QSet<ClientData*> clients;
     DBManager* db;

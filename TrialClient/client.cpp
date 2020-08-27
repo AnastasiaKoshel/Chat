@@ -66,6 +66,16 @@ void Client::displayError(QAbstractSocket::SocketError socketError)
     }
 }
 
+void Client::getRequestedChat(std::string senderLogin, std::string recipientLogin)
+{
+    qDebug() << "get Requested Chat for "<<senderLogin.c_str()<< " and "<<recipientLogin.c_str();
+
+    QJsonObject messageJson;
+    messageJson["type"] = "getChat";
+    messageJson["senderLogin"] = senderLogin.c_str();
+    messageJson["recipientLogin"] = recipientLogin.c_str();
+}
+
 void Client::processJson()
 {
     QByteArray jsonData = tcpSocket->read(1000);
@@ -82,6 +92,15 @@ void Client::processJson()
     else if(type == "newAccount"){
         emit newAccountSignal(json.object().value("status").toString().toStdString());
     }
+    else if(type == "getUserIdbyLogin")
+    {
+        emit userIdbyLoginSignal(json.object().value("myId").toInt(),
+                                 json.object().value("otherId").toInt());
+    }
+    else if(type =="userList")
+    {
+        emit userListReceived(json.object().value("userList").toArray());
+    }
     else
     {
         std::string text= json.object().value("value").toString().toStdString();
@@ -89,4 +108,26 @@ void Client::processJson()
         messageCur += text;
         emit processMessageSignal();
     }
+}
+std::vector<Message> Client::getSelectedChat(std::string myLogin, std::string otherLogin)
+{
+
+    qDebug() << "Send get reequested chat message";
+
+    QJsonObject messageJson;
+    messageJson["type"] = "getUserIdbyLogin";
+    messageJson["mylogin"] = myLogin.c_str();
+    messageJson["otherLogin"] = otherLogin.c_str();
+
+    const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
+    tcpSocket->write(jsonData);
+
+}
+
+void Client::requestAllUsers()
+{
+    QJsonObject messageJson;
+    messageJson["type"] ="getAllUsers";
+    const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
+    tcpSocket->write(jsonData);
 }

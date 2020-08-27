@@ -21,7 +21,11 @@ void Login::loginSignalReceived(std::string status)
     if(status == "Success")
         emit logInSuccess();
     else
+    {
         ui->statusLabel->setText("Wrong Password");
+        ui->loginLine->clear();
+        ui->passwordLine->clear();
+    }
 }
 
 void Login::on_loginButton_clicked()

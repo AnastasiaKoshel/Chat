@@ -19,11 +19,12 @@ class MainWidget : public QDialog
 public:
     explicit MainWidget(QWidget *parent = nullptr);
     ~MainWidget();
-    Client client;
+    Client *client;
 
 private slots:
     void on_mainLogInButton_clicked();
-    void showDialog();
+    void showDialog(QJsonArray userArray);
+    void requestUserList();
 
     void on_newAccountButton_clicked();
 

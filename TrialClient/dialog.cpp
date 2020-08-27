@@ -1,13 +1,16 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 
-Dialog::Dialog(Client *cl, QWidget *parent) :
+Dialog::Dialog(Client *cl, QJsonArray usersArray, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog),
-    client(cl)
+    client(cl),
+    usersList(usersArray)
 {
     ui->setupUi(this);
-    db = QSqlDatabase::addDatabase("QSQLITE");
+    db = new MessagesDataBase();
+    /*
+            QSqlDatabase::addDatabase("QSQLITE");
     db.setDatabaseName("C:/Users/Anastasiia_Koshel/SQlite/clientData.db");
     //qDebug() << QSqlDatabase::drivers();
     if (!db.open())
@@ -31,13 +34,17 @@ Dialog::Dialog(Client *cl, QWidget *parent) :
             client->contactsList.push_back(query.value(1).toString().toStdString());
         }
     }
-    for(auto contact : client->contactsList)
+    */
+    for(auto user : usersArray)
     {
-        ui->listWidget->addItem(contact.c_str());
+        ui->listWidget->addItem(user.toString());
+        qDebug() << "Login received :" <<user.toString();
     }
 
+    //client->requestAllUsers();
 
     connect(client, SIGNAL(processMessageSignal()), this, SLOT(displayMessage()));
+    connect(client, SIGNAL(userIdbyLoginSignal()), this, SLOT(getChat()));
 }
 
 Dialog::~Dialog()
@@ -64,15 +71,16 @@ void Dialog::on_listWidget_itemClicked(QListWidgetItem *item)
 {
     std::string currentChatLogin= item->text().toStdString();
     qDebug()<<currentChatLogin.c_str();
+
     QSqlQuery query;
     query.prepare("SELECT * FROM clientData WHERE login = (:currentChatLogin)");
     query.bindValue(":currentChatLogin", currentChatLogin.c_str());
     query.first();
     client->currentChatID = query.value(0).toInt();
-    displayChat();
+   // displayChat();
 }
 
-void Dialog::displayChat()
+void Dialog::getChat(int myId, int otherId)
 {
 
 }

@@ -57,11 +57,29 @@ void Server::jsonReceived()
     else if(type == "newAccount"){
         processNewAccount(json.object(), client);
     }
+    else if(type == "getAllUsers"){
+        sendUsersList(client);
+    }
     else{
         processMessage(json.object(), client);
     }
 }
+void Server::sendUsersList(QTcpSocket* sender)
+{
+    QJsonObject messageJson;
+    messageJson["type"]="userList";
+    QJsonArray usersArray;
+    std::vector<std::string> usersVector = db->getAllUsers();
+    for(auto user : usersVector )
+    {
+         //QJsonObject userJson;
+         usersArray.append(QJsonValue(user.c_str()));
+    }
+    messageJson["userList"]=usersArray;
+    const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
+    sender->write(jsonData);
 
+}
 void Server::processLogin(const QJsonObject& json,  QTcpSocket* sender)
 {
     qDebug()<<"Login json";

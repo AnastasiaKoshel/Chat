@@ -11,7 +11,7 @@ public:
     bool addClient(std::string login, std::string password);
     bool loginPresent(std::string login);
     bool loginAndPasswordMatch(std::string login, std::string password);
-    bool printAll();
+    std::vector<std::string> getAllUsers();
 
 private:
     QSqlDatabase db;

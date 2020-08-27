@@ -20,15 +20,25 @@ void NewAccount::newAccountSignalReceived(std::string status)
     if(status == "Success")
         emit createNewAccountSuccess();
     else
-        ui->statusLabel->setText("This login Already exists");
+    {
+        ui->statusLabel->setText("This login already exists");
+        ui->loginLine->clear();
+        ui->passwordLine1->clear();
+        ui->passwordLine2->clear();
+    }
 }
 
 void NewAccount::on_okButton_clicked()
 {
     QString login = ui->loginLine->text();
-    QString password = ui->passwordLine1->text();
+    QString password1 = ui->passwordLine1->text();
+    QString password2 = ui->passwordLine2->text();
 
-    client->sendNewAccountMessage(login.toStdString(), password.toStdString());
-    //emit logInSuccess();
+    if(password1 != password2)
+    {
+        ui->statusLabel->setText("Passwords don`t match");
+        return;
+    }
+    client->sendNewAccountMessage(login.toStdString(), password1.toStdString());
 
 }

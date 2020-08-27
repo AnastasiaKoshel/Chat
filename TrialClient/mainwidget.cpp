@@ -7,13 +7,13 @@ MainWidget::MainWidget(QWidget *parent) :
     ui(new Ui::MainWidget),
     client(new Client())
 {
-    dialog = new Dialog(&client);
-    login = new Login(&client);
-    newAccount = new NewAccount(&client);
-    client.connectToServer();
+    login = new Login(client);
+    newAccount = new NewAccount(client);
+    client->connectToServer();
     ui->setupUi(this);
-    connect(login, SIGNAL(logInSuccess()), this, SLOT(showDialog()));
-    connect(newAccount, SIGNAL(createNewAccountSuccess()), this, SLOT(showDialog()));
+    connect(client, SIGNAL(userListReceived(QJsonArray)), this, SLOT(showDialog(QJsonArray)));
+    connect(login, SIGNAL(logInSuccess()), this, SLOT(requestUserList()));
+    connect(newAccount, SIGNAL(createNewAccountSuccess()), this, SLOT(requestUserList()));
 }
 
 MainWidget::~MainWidget()
@@ -27,9 +27,13 @@ void MainWidget::on_mainLogInButton_clicked()
     this->close();
     login->show();
 }
-
-void MainWidget::showDialog()
+void MainWidget::requestUserList()
 {
+    client->requestAllUsers();
+}
+void MainWidget::showDialog(QJsonArray userArray)
+{
+    dialog = new Dialog(client, userArray);
     qDebug()<<"Entered Show Dialog";
     dialog->show();
     login->close();

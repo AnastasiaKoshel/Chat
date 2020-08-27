@@ -35,18 +35,22 @@ bool DBManager::addClient(std::string login, std::string password)
          qDebug() << "addPerson error:  "
                   << query.lastError();
     }
-     printAll();
+    // printAll();
     return success;
 }
-bool DBManager::printAll()
+std::vector<std::string> DBManager::getAllUsers()
 {
+    std::vector<std::string> allLogins;
     QSqlQuery query("SELECT * FROM clientData");
     int idName = query.record().indexOf("login");
     while (query.next())
     {
        QString name = query.value(idName).toString();
+       allLogins.push_back(name.toStdString());
+
        qDebug() << name;
     }
+    return allLogins;
 }
 
 bool DBManager::loginPresent(std::string login)
