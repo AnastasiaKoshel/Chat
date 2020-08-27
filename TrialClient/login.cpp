@@ -19,7 +19,10 @@ Login::~Login()
 void Login::loginSignalReceived(std::string status)
 {
     if(status == "Success")
+    {
+        client->setLogin(ui->loginLine->text().toStdString());
         emit logInSuccess();
+    }
     else
     {
         ui->statusLabel->setText("Wrong Password");

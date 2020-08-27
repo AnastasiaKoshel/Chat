@@ -2,7 +2,7 @@
 
 MessagesDBManager::MessagesDBManager()
 {
-    messagesDB = QSqlDatabase::addDatabase("QSQLITE");
+    messagesDB = QSqlDatabase::addDatabase("QSQLITE", "MessageData");
     messagesDB.setDatabaseName(path);
     qDebug() << QSqlDatabase::drivers();
     if (!messagesDB.open())
@@ -15,3 +15,37 @@ MessagesDBManager::MessagesDBManager()
     }
 }
 
+
+bool MessagesDBManager::writeMessageToDB(std::string message, int senderID, int recipientID)
+{
+    qDebug()<<"Entered writeMessageToDB message:"<<message.c_str()<<" senderID:"<<senderID<<" recipientID:"<<recipientID;
+    if(!senderID || !recipientID)
+    {
+        qDebug()<<"No such user";
+        return false;
+    }
+
+
+    qint64 timestamp = QDateTime::currentSecsSinceEpoch();
+    QSqlQuery query(messagesDB);
+    query.prepare("INSERT INTO messageData (sender, receiver, message, timestamp) "
+                  "VALUES (:senderID, :recipientID, :message, :timestamp)");
+    //query.bindValue(":id", 0);
+    query.bindValue(":senderID", senderID);
+    query.bindValue(":recipientID", recipientID);
+    query.bindValue(":message", message.c_str());
+    query.bindValue(":timestamp", timestamp);
+
+
+    if(query.exec())
+    {
+        return true;
+    }
+    else
+    {
+         qDebug() << "insert message error:  "
+                  << query.lastError();
+    }
+    // printAll();
+    return false;
+}

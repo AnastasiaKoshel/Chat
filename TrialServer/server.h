@@ -10,6 +10,7 @@
 #include "vector"
 #include <QSet>
 #include "dbmanager.h"
+#include "messagesdbmanager.h"
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -47,9 +48,10 @@ private:
     void processNewAccount(const QJsonObject& json,  QTcpSocket* sender);
     void processMessage(const QJsonObject& json, QTcpSocket* sender);
     void sendUsersList(QTcpSocket* sender);
-    QTcpServer *tcpServer = nullptr;
+    QTcpServer* tcpServer = nullptr;
     QSet<ClientData*> clients;
     DBManager* db;
+    MessagesDBManager* messagesDB;
 
 };
 

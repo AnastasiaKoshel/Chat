@@ -3,7 +3,7 @@
 DBManager::DBManager()
 {
 
-    db = QSqlDatabase::addDatabase("QSQLITE");
+    db = QSqlDatabase::addDatabase("QSQLITE", "ClientData");
     db.setDatabaseName(path);
     qDebug() << QSqlDatabase::drivers();
     if (!db.open())
@@ -20,8 +20,7 @@ bool DBManager::addClient(std::string login, std::string password)
 {
     bool success = false;
     // you should check if args are ok first...
-    QSqlQuery query;
-    int id = 1;
+    QSqlQuery query(db);
     query.prepare("INSERT INTO clientData (id, login, password) VALUES (NULL, :login, :password)");
     query.bindValue(":login", login.c_str());
     query.bindValue(":password", password.c_str());
@@ -41,7 +40,10 @@ bool DBManager::addClient(std::string login, std::string password)
 std::vector<std::string> DBManager::getAllUsers()
 {
     std::vector<std::string> allLogins;
-    QSqlQuery query("SELECT * FROM clientData");
+     qDebug() << "Enter getAllUsers in server";
+    QSqlQuery query(db);
+    query.prepare("SELECT * FROM clientData");
+    query.exec();
     int idName = query.record().indexOf("login");
     while (query.next())
     {
@@ -53,28 +55,28 @@ std::vector<std::string> DBManager::getAllUsers()
     return allLogins;
 }
 
-bool DBManager::loginPresent(std::string login)
+int DBManager::getIDbyLogin(std::string login)
 {
-    QSqlQuery query;
+    QSqlQuery query(db);
     query.prepare("SELECT * FROM clientData WHERE login = (:login)");
     query.bindValue(":login", login.c_str());
     if( !query.exec() )
     {
         qDebug() << "Error getting user info from DB";
-        return false;
+        return 0;
     }
     while(query.next())
     {
         qDebug() << "Login: " << query.value(0).toString();
         qDebug() << "Password: " << query.value(1).toString();
-        return true;
+        return query.value(0).toInt();;
     }
-    return false;
+    return 0;
 }
 
 bool DBManager::loginAndPasswordMatch(std::string login, std::string password)
 {
-    QSqlQuery query;
+    QSqlQuery query(db);
     query.prepare("SELECT * FROM clientData WHERE login = (:login)");
     query.bindValue(":login", login.c_str());
     if( !query.exec() )

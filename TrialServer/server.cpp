@@ -19,6 +19,7 @@ bool Server::initServer()
     connect(tcpServer, &QTcpServer::newConnection, this, &Server::initClient);
 
     db = new DBManager();
+    messagesDB = new MessagesDBManager();
 
 
     if (!success) {
@@ -108,11 +109,12 @@ void Server::processNewAccount(const QJsonObject& json,  QTcpSocket* sender)
     qDebug()<<"New Account json";
     const QJsonValue login = json.value("login");
     const QJsonValue password = json.value("password");
-    bool ifLoginExists = db->loginPresent(login.toString().toStdString());
+
+    int id = db->getIDbyLogin(login.toString().toStdString());
 
     QJsonObject messageJson;
     messageJson["type"] = "newAccount";
-    if(ifLoginExists)
+    if(id)
     {
        messageJson["status"] = "Fail";
     }
@@ -131,8 +133,12 @@ void Server::processNewAccount(const QJsonObject& json,  QTcpSocket* sender)
 void Server::processMessage(const QJsonObject& json, QTcpSocket* sender)
 {
     qDebug()<<"Message json";
-    const QJsonValue messageText = json.value("value");
-    const std::string message = messageText.toString().toStdString();
+    const std::string message = json.value("value").toString().toStdString();
+    const std::string senderLogin = json.value("senderLogin").toString().toStdString();
+    const std::string recipientLogin = json.value("recipientLogin").toString().toStdString();
+
+    messagesDB->writeMessageToDB(message, db->getIDbyLogin(senderLogin),db->getIDbyLogin(recipientLogin));
+
     QJsonObject messageJson;
     messageJson["type"] = "message";
     messageJson["value"] = message.c_str();

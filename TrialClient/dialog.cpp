@@ -44,7 +44,7 @@ Dialog::Dialog(Client *cl, QJsonArray usersArray, QWidget *parent) :
     //client->requestAllUsers();
 
     connect(client, SIGNAL(processMessageSignal()), this, SLOT(displayMessage()));
-    connect(client, SIGNAL(userIdbyLoginSignal()), this, SLOT(getChat()));
+    connect(client, SIGNAL(userIdbyLoginSignal(int, int)), this, SLOT(getChat(int, int)));
 }
 
 Dialog::~Dialog()
@@ -55,7 +55,7 @@ Dialog::~Dialog()
 void Dialog::on_sendButton_clicked()
 {
     QString message = ui->textEdit->toPlainText();
-    client->sendTextMessage(message.toStdString(), client->currentChatID);
+    client->sendTextMessage(message.toStdString());
     message = ui->labelYourMessage->text() + '\n'+ message;
     ui->labelYourMessage->setText(message);
     ui->textEdit->clear();
@@ -69,14 +69,15 @@ void Dialog::displayMessage()
 
 void Dialog::on_listWidget_itemClicked(QListWidgetItem *item)
 {
-    std::string currentChatLogin= item->text().toStdString();
-    qDebug()<<currentChatLogin.c_str();
+   // std::string currentChatLogin= item->text().toStdString();
 
-    QSqlQuery query;
-    query.prepare("SELECT * FROM clientData WHERE login = (:currentChatLogin)");
-    query.bindValue(":currentChatLogin", currentChatLogin.c_str());
-    query.first();
-    client->currentChatID = query.value(0).toInt();
+
+    //QSqlQuery query;
+    //query.prepare("SELECT * FROM clientData WHERE login = (:currentChatLogin)");
+    //query.bindValue(":currentChatLogin", currentChatLogin.c_str());
+    //query.first();
+    client->setCurrentChatLogin(item->text().toStdString());
+     qDebug()<<item->text();
    // displayChat();
 }
 

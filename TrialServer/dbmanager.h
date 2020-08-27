@@ -9,9 +9,10 @@ public:
     DBManager();
     const QString path = "C:/Users/Anastasiia_Koshel/SQlite/clientData.db";
     bool addClient(std::string login, std::string password);
-    bool loginPresent(std::string login);
+    int getIDbyLogin(std::string login);
     bool loginAndPasswordMatch(std::string login, std::string password);
     std::vector<std::string> getAllUsers();
+
 
 private:
     QSqlDatabase db;

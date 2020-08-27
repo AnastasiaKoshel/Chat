@@ -31,17 +31,19 @@ class Client : public QObject
 
 public:
     explicit Client(QObject  *parent = nullptr);
-    void sendTextMessage(std::string text, int recipientID);
+    void sendTextMessage(std::string text);
     void sendLoginMessage(std::string login, std::string password);
     void sendNewAccountMessage(std::string login, std::string password);
     void getRequestedChat(std::string senderLogin, std::string recipientLogin);
     void processMessage();
     void processJson();
     void requestAllUsers();
+    void setLogin(const std::string login) {myLogin = login;}
+    void setCurrentChatLogin(const std::string login ) {currentChatLogin = login;}
     std::vector<Message> getSelectedChat(std::string myLogin, std::string otherLogin);
     std::string messageCur;
     std::vector<std::string> contactsList;
-    int currentChatID;
+
 
 signals:
     void processMessageSignal();
@@ -60,6 +62,8 @@ public slots:
 private:
     QTcpSocket *tcpSocket = nullptr;
     bool isLoggedIn = false;
+    std::string myLogin;
+    std::string currentChatLogin;
 
 
 };

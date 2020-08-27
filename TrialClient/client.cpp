@@ -20,14 +20,15 @@ void Client::connectToServer()
     qDebug() << "Connect to Server";
 }
 
-void Client::sendTextMessage(std::string text, int recipientID)
+void Client::sendTextMessage(std::string text)
 {
     qDebug() << "Send message";
 
     QJsonObject messageJson;
     messageJson["type"] = "message";
     messageJson["value"] = text.c_str();
-    messageJson["recipientID"] = recipientID;
+    messageJson["recipientLogin"] = currentChatLogin.c_str();
+    messageJson["senderLogin"] = myLogin.c_str();
 
     const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
     tcpSocket->write(jsonData);
@@ -131,3 +132,4 @@ void Client::requestAllUsers()
     const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
     tcpSocket->write(jsonData);
 }
+
