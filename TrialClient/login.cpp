@@ -18,8 +18,10 @@ Login::~Login()
 
 void Login::loginSignalReceived(std::string status)
 {
+    qDebug()<<"entered loginSignalReceived in Login class";
     if(status == "Success")
     {
+        qDebug()<<"My login is: "<< ui->loginLine->text();
         client->setLogin(ui->loginLine->text().toStdString());
         emit logInSuccess();
     }

@@ -9,42 +9,16 @@ Dialog::Dialog(Client *cl, QJsonArray usersArray, QWidget *parent) :
 {
     ui->setupUi(this);
     db = new MessagesDataBase();
-    /*
-            QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("C:/Users/Anastasiia_Koshel/SQlite/clientData.db");
-    //qDebug() << QSqlDatabase::drivers();
-    if (!db.open())
-    {
-       qDebug() << "Error: connection with database fail";
-    }
-    QSqlQuery query;
-    query.prepare("SELECT * FROM clientData");
-    if(!query.exec())
-    {
-        qDebug() << "Can't Execute Query !";
-    }
-    else
-    {
-        qDebug() << "Query Executed Successfully !";
-        while(query.next())
-        {
-            qDebug() << "Password : " << query.value(2).toString();
-            qDebug() << "Login : " << query.value(1).toString();
-            qDebug() << "Id : " << query.value(0).toString();
-            client->contactsList.push_back(query.value(1).toString().toStdString());
-        }
-    }
-    */
+
     for(auto user : usersArray)
     {
         ui->listWidget->addItem(user.toString());
         qDebug() << "Login received :" <<user.toString();
     }
 
-    //client->requestAllUsers();
 
     connect(client, SIGNAL(processMessageSignal()), this, SLOT(displayMessage()));
-    connect(client, SIGNAL(userIdbyLoginSignal(int, int)), this, SLOT(getChat(int, int)));
+    connect(client, SIGNAL(userIdbyLoginSignal(int, int)), this, SLOT(displayChat(int, int)));
 }
 
 Dialog::~Dialog()
@@ -69,19 +43,40 @@ void Dialog::displayMessage()
 
 void Dialog::on_listWidget_itemClicked(QListWidgetItem *item)
 {
-   // std::string currentChatLogin= item->text().toStdString();
+    qDebug()<< "Clicked on list widget item";
 
-
-    //QSqlQuery query;
-    //query.prepare("SELECT * FROM clientData WHERE login = (:currentChatLogin)");
-    //query.bindValue(":currentChatLogin", currentChatLogin.c_str());
-    //query.first();
     client->setCurrentChatLogin(item->text().toStdString());
+    client->getSelectedChat();
      qDebug()<<item->text();
    // displayChat();
 }
 
-void Dialog::getChat(int myId, int otherId)
+void Dialog::displayChat(int myId, int otherId)
 {
+    std::vector<Message> messageHistory = db->getMessageHistory(myId, otherId);
+    std::string myMessageText="";
+    std::string otherMessageText="";
+    std::string fillerMessage;
 
+    for(Message curMessage : messageHistory)
+    {
+        if(curMessage.isMyMessage)
+        {
+            myMessageText += (curMessage.text + '\n');
+            qDebug()<<"My message "<<myMessageText.c_str();
+            std::string fillerMessage(' ', curMessage.text.length());
+            otherMessageText += (fillerMessage  + '\n');
+        }
+        else
+        {
+            otherMessageText += (curMessage.text  + '\n');
+            std::string fillerMessage(' ', curMessage.text.length());
+            myMessageText += (fillerMessage  + '\n');
+        }
+
+    }
+    qDebug()<<"My messages "<<myMessageText.c_str();
+    ui->labelYourMessage->setText(myMessageText.c_str());
+    qDebug()<<"Other messages "<<myMessageText.c_str();
+    ui->label->setText(otherMessageText.c_str());
 }

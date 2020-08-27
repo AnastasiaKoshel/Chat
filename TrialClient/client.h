@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <QJsonArray>
+#include "messagesdatabase.h"
 
 QT_BEGIN_NAMESPACE
 class QComboBox;
@@ -19,11 +20,7 @@ QT_END_NAMESPACE
 //! [0]
 //!
 //!
-struct Message
-{
-    std::string text;
-    bool isMyMessage;
-};
+
 
 class Client : public QObject
 {
@@ -40,7 +37,7 @@ public:
     void requestAllUsers();
     void setLogin(const std::string login) {myLogin = login;}
     void setCurrentChatLogin(const std::string login ) {currentChatLogin = login;}
-    std::vector<Message> getSelectedChat(std::string myLogin, std::string otherLogin);
+    void getSelectedChat();
     std::string messageCur;
     std::vector<std::string> contactsList;
 

@@ -95,8 +95,8 @@ void Client::processJson()
     }
     else if(type == "getUserIdbyLogin")
     {
-        emit userIdbyLoginSignal(json.object().value("myId").toInt(),
-                                 json.object().value("otherId").toInt());
+        emit userIdbyLoginSignal(json.object().value("id1").toInt(),
+                                 json.object().value("id2").toInt());
     }
     else if(type =="userList")
     {
@@ -110,19 +110,17 @@ void Client::processJson()
         emit processMessageSignal();
     }
 }
-std::vector<Message> Client::getSelectedChat(std::string myLogin, std::string otherLogin)
+void Client::getSelectedChat()
 {
-
-    qDebug() << "Send get reequested chat message";
+    qDebug() << "Entered getSelectedChat and my login is "<<myLogin.c_str();
 
     QJsonObject messageJson;
     messageJson["type"] = "getUserIdbyLogin";
-    messageJson["mylogin"] = myLogin.c_str();
-    messageJson["otherLogin"] = otherLogin.c_str();
+    messageJson["myLogin"] = myLogin.c_str();
+    messageJson["otherLogin"] = currentChatLogin.c_str();
 
     const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
     tcpSocket->write(jsonData);
-
 }
 
 void Client::requestAllUsers()

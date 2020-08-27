@@ -25,7 +25,7 @@ private slots:
 
     void on_sendButton_clicked();
     void displayMessage();
-    void getChat(int myId, int otherId);
+    void displayChat(int myId, int otherId);
 
     void on_listWidget_itemClicked(QListWidgetItem *item);
 

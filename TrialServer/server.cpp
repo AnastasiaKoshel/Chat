@@ -61,6 +61,10 @@ void Server::jsonReceived()
     else if(type == "getAllUsers"){
         sendUsersList(client);
     }
+    else if(type == "getUserIdbyLogin")
+    {
+        sendUserIdbyLogin(json.object(), client);
+    }
     else{
         processMessage(json.object(), client);
     }
@@ -156,3 +160,22 @@ void Server::processMessage(const QJsonObject& json, QTcpSocket* sender)
 
 }
 
+void Server::sendUserIdbyLogin(const QJsonObject& json, QTcpSocket* sender)
+{
+    qDebug()<<"entered sendUserIdbyLogin";
+
+    std::string login1 = json.value("myLogin").toString().toStdString();
+    std::string login2 = json.value("otherLogin").toString().toStdString();
+    int id1 = db->getIDbyLogin(login1);
+    int id2 = db->getIDbyLogin(login2);
+
+    qDebug()<<"Received logins "<<login1.c_str()<<" and "<<login2.c_str()<<" Return ids "<<id1<<" and "<<id2;
+
+    QJsonObject messageJson;
+    messageJson["type"] = "getUserIdbyLogin";
+    messageJson["id1"] = id1;
+    messageJson["id2"] = id2;
+
+    const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
+    sender->write(jsonData);
+}
