@@ -107,7 +107,8 @@ void Client::processJson()
         std::string text= json.object().value("value").toString().toStdString();
         text+='\n';
         messageCur += text;
-        emit processMessageSignal();
+        emit processMessageSignal(json.object().value("text").toString().toStdString(),
+                                  json.object().value("recipientLogin").toString().toStdString());
     }
 }
 void Client::getSelectedChat()

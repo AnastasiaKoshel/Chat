@@ -38,6 +38,7 @@ public:
 
 private slots:
     void jsonReceived();
+    void deleteUser();
 
 signals:
     void processMessageSignal(std::string s);
@@ -50,7 +51,7 @@ private:
     void sendUsersList(QTcpSocket* sender);
     void sendUserIdbyLogin(const QJsonObject& json, QTcpSocket* sender);
     QTcpServer* tcpServer = nullptr;
-    QSet<ClientData*> clients;
+    std::vector<ClientData*> clients;
     DBManager* db;
     MessagesDBManager* messagesDB;
 

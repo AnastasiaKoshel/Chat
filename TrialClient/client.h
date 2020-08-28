@@ -35,15 +35,19 @@ public:
     void processMessage();
     void processJson();
     void requestAllUsers();
+
     void setLogin(const std::string login) {myLogin = login;}
+    std::string getLogin() {return myLogin;}
     void setCurrentChatLogin(const std::string login ) {currentChatLogin = login;}
+    std::string getCurrentChatLogin() { return currentChatLogin;}
+
     void getSelectedChat();
     std::string messageCur;
     std::vector<std::string> contactsList;
 
 
 signals:
-    void processMessageSignal();
+    void processMessageSignal(std::string message, std::string recipientLogin);
     void disconnected();
     void loginJsonSignal(std::string status);
     void newAccountSignal(std::string status);

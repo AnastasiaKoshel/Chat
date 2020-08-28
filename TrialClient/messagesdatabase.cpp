@@ -58,7 +58,7 @@ std::vector<Message> MessagesDataBase::getMessageHistory(int myID, int otherID)
     sort(messageHistory.begin(), messageHistory.end(),
         [](const Message& a, const Message& b) -> bool
     {
-        return a.timestamp > b.timestamp;
+        return a.timestamp < b.timestamp;
     });
 
     return messageHistory;

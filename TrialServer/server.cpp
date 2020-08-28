@@ -32,7 +32,7 @@ void Server::initClient()
 {
     ClientData* client = new ClientData();
     client->clientSocket = tcpServer->nextPendingConnection();
-    clients.insert(client);
+    clients.push_back(client);
 
     emit processMessageSignal("New client from:" + std::to_string(client->clientSocket->socketDescriptor()));
     connect(client->clientSocket, &QIODevice::readyRead,
@@ -40,6 +40,8 @@ void Server::initClient()
 
     connect(client->clientSocket, &QAbstractSocket::disconnected,
             client->clientSocket, &QObject::deleteLater);
+    connect(client->clientSocket, &QAbstractSocket::disconnected,
+            this, &Server::deleteUser);
 }
 
 
@@ -103,6 +105,14 @@ void Server::processLogin(const QJsonObject& json,  QTcpSocket* sender)
     const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
     sender->write(jsonData);
 
+
+    for(auto curClient : clients)
+    {
+        if(curClient->clientSocket->socketDescriptor() == sender->socketDescriptor())
+        {
+            curClient->login = login.toString().toStdString();
+        }
+    }
     emit processMessageSignal("Login: " + login.toString().toStdString() + "  \nPassword: " + password.toString().toStdString());
 
 }
@@ -129,9 +139,16 @@ void Server::processNewAccount(const QJsonObject& json,  QTcpSocket* sender)
        emit processMessageSignal("New Account has been created");
     }
 
-
     const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
     sender->write(jsonData);
+
+    for(auto curClient : clients)
+    {
+        if(curClient->clientSocket->socketDescriptor() == sender->socketDescriptor())
+        {
+            curClient->login = login.toString().toStdString();
+        }
+    }
 
 }
 void Server::processMessage(const QJsonObject& json, QTcpSocket* sender)
@@ -145,13 +162,14 @@ void Server::processMessage(const QJsonObject& json, QTcpSocket* sender)
 
     QJsonObject messageJson;
     messageJson["type"] = "message";
-    messageJson["value"] = message.c_str();
+    messageJson["text"] = message.c_str();
+    messageJson["recipientLogin"] = recipientLogin.c_str();
     const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
 
-    const int recipient = json.value("recipientID").toInt();
+    //const int recipient = json.value("recipientID").toInt();
     foreach(ClientData* clientCur, clients)
     {
-        if(clientCur->clientSocket->socketDescriptor()!=sender->socketDescriptor())
+        if(clientCur->login == recipientLogin)
         {
             clientCur->clientSocket->write(jsonData);
             emit processMessageSignal(message);
@@ -178,4 +196,14 @@ void Server::sendUserIdbyLogin(const QJsonObject& json, QTcpSocket* sender)
 
     const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
     sender->write(jsonData);
+}
+
+
+void Server::deleteUser()
+{
+    for (int i = 0; i<clients.size(); ++i)
+    {
+        if(clients[i]->clientSocket->socketDescriptor() == ((QTcpSocket*)sender())->socketDescriptor())
+            clients.erase(clients.begin()+i-1, clients.begin()+i);
+    }
 }

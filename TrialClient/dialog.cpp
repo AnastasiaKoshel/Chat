@@ -17,7 +17,7 @@ Dialog::Dialog(Client *cl, QJsonArray usersArray, QWidget *parent) :
     }
 
 
-    connect(client, SIGNAL(processMessageSignal()), this, SLOT(displayMessage()));
+    connect(client, SIGNAL(processMessageSignal(std::string, std::string)), this, SLOT(displayMessage(std::string, std::string)));
     connect(client, SIGNAL(userIdbyLoginSignal(int, int)), this, SLOT(displayChat(int, int)));
 }
 
@@ -35,15 +35,22 @@ void Dialog::on_sendButton_clicked()
     ui->textEdit->clear();
 }
 
-void Dialog::displayMessage()
+void Dialog::displayMessage(std::string message, std::string recipientLogin)
 {
-    ui->label->setText(client->messageCur.c_str());
+    qDebug()<<"curChatLogin "<<client->getLogin().c_str()<<" recipient Login "<<recipientLogin.c_str();
+    if(client->getLogin() == recipientLogin)
+    {
+        std::string curMessage = ui->label->text().toStdString();
+        curMessage += "\n";
+        curMessage += message;
+        ui->label->setText(curMessage.c_str());
+    }
 }
 
 
 void Dialog::on_listWidget_itemClicked(QListWidgetItem *item)
 {
-    qDebug()<< "Clicked on list widget item";
+    qDebug()<< "Clicked on list widget item and login is "<<item->text();
 
     client->setCurrentChatLogin(item->text().toStdString());
     client->getSelectedChat();
@@ -56,22 +63,21 @@ void Dialog::displayChat(int myId, int otherId)
     std::vector<Message> messageHistory = db->getMessageHistory(myId, otherId);
     std::string myMessageText="";
     std::string otherMessageText="";
-    std::string fillerMessage;
 
     for(Message curMessage : messageHistory)
     {
-        if(curMessage.isMyMessage)
+        if(curMessage.isMyMessage && !curMessage.text.empty())
         {
-            myMessageText += (curMessage.text + '\n');
-            qDebug()<<"My message "<<myMessageText.c_str();
-            std::string fillerMessage(' ', curMessage.text.length());
-            otherMessageText += (fillerMessage  + '\n');
+            myMessageText += (curMessage.text + "\n");
+            //qDebug()<<"My message "<<myMessageText.c_str();
+            //std::string fillerMessage('_', curMessage.text.length());
+            otherMessageText += "\n";
         }
         else
         {
-            otherMessageText += (curMessage.text  + '\n');
-            std::string fillerMessage(' ', curMessage.text.length());
-            myMessageText += (fillerMessage  + '\n');
+            otherMessageText += (curMessage.text  + "\n");
+            //std::string fillerMessage('_', curMessage.text.length());
+            myMessageText += "\n";
         }
 
     }
