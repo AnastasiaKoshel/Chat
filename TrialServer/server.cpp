@@ -15,6 +15,7 @@ bool Server::initServer()
 {
     tcpServer = new QTcpServer(this);
     bool success = tcpServer->listen(QHostAddress::Any, 1234);
+    clients.resize(1000);
 
     connect(tcpServer, &QTcpServer::newConnection, this, &Server::initClient);
 
