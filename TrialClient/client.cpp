@@ -7,11 +7,11 @@
 //! [0]
 Client::Client(QObject *parent)
     : QObject(parent)
-    , tcpSocket(new QTcpSocket(this))
 {
-    connect(tcpSocket, &QTcpSocket::disconnected, this, &Client::disconnected);
-    connect(tcpSocket, &QAbstractSocket::errorOccurred, this, &Client::displayError);
-    connect(tcpSocket, &QIODevice::readyRead, this, &Client::processJson);
+    tcpSocket = std::make_unique<QTcpSocket>(this);
+    connect(tcpSocket.get(), &QTcpSocket::disconnected, this, &Client::disconnected);
+    connect(tcpSocket.get(), &QAbstractSocket::errorOccurred, this, &Client::displayError);
+    connect(tcpSocket.get(), &QIODevice::readyRead, this, &Client::processJson);
 }
 
 void Client::connectToServer()

@@ -61,7 +61,7 @@ public slots:
 
 
 private:
-    QTcpSocket *tcpSocket = nullptr;
+    std::unique_ptr<QTcpSocket> tcpSocket;
     bool isLoggedIn = false;
     std::string myLogin;
     std::string currentChatLogin;

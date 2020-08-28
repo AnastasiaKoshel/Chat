@@ -13,14 +13,14 @@ Server::Server(QObject *parent)
 
 bool Server::initServer()
 {
-    tcpServer = new QTcpServer(this);
+    tcpServer = std::make_unique<QTcpServer>(this);
     bool success = tcpServer->listen(QHostAddress::Any, 1234);
-    clients.resize(1000);
+    clients.reserve(1000);
 
-    connect(tcpServer, &QTcpServer::newConnection, this, &Server::initClient);
+    connect(tcpServer.get(), &QTcpServer::newConnection, this, &Server::initClient);
 
-    db = new DBManager();
-    messagesDB = new MessagesDBManager();
+    db = std::make_unique<DBManager>();
+    messagesDB = std::make_unique<MessagesDBManager>();
 
 
     if (!success) {

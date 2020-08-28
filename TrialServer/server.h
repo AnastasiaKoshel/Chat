@@ -50,10 +50,10 @@ private:
     void processMessage(const QJsonObject& json, QTcpSocket* sender);
     void sendUsersList(QTcpSocket* sender);
     void sendUserIdbyLogin(const QJsonObject& json, QTcpSocket* sender);
-    QTcpServer* tcpServer = nullptr;
+    std::unique_ptr<QTcpServer> tcpServer;
     std::vector<ClientData*> clients;
-    DBManager* db;
-    MessagesDBManager* messagesDB;
+    std::unique_ptr<DBManager> db;
+    std::unique_ptr<MessagesDBManager> messagesDB;
 
 };
 

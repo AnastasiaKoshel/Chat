@@ -18,7 +18,10 @@ NewAccount::~NewAccount()
 void NewAccount::newAccountSignalReceived(std::string status)
 {
     if(status == "Success")
+    {
+        client->setLogin(ui->loginLine->text().toStdString());
         emit createNewAccountSuccess();
+    }
     else
     {
         ui->statusLabel->setText("This login already exists");

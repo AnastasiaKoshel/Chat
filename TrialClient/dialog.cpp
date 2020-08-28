@@ -8,8 +8,9 @@ Dialog::Dialog(Client *cl, QJsonArray usersArray, QWidget *parent) :
     usersList(usersArray)
 {
     ui->setupUi(this);
-    db = new MessagesDataBase();
+    db = std::make_unique<MessagesDataBase>();
 
+    ui->titleLabel->setText(cl->getLogin().c_str());
     for(auto user : usersArray)
     {
         ui->listWidget->addItem(user.toString());

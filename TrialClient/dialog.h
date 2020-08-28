@@ -31,8 +31,8 @@ private slots:
 
 private:
     Ui::Dialog *ui;
-    Client *client;
-    MessagesDataBase* db;
+    Client* client;
+    std::unique_ptr<MessagesDataBase> db;
     QJsonArray usersList;
 };
 
