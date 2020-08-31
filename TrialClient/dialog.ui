@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>400</width>
-    <height>300</height>
+    <width>542</width>
+    <height>406</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -40,9 +40,9 @@ background-color:#c5fdff;
   <widget class="QTextEdit" name="textEdit">
    <property name="geometry">
     <rect>
-     <x>43</x>
-     <y>190</y>
-     <width>331</width>
+     <x>160</x>
+     <y>320</y>
+     <width>381</width>
      <height>41</height>
     </rect>
    </property>
@@ -50,8 +50,8 @@ background-color:#c5fdff;
   <widget class="QPushButton" name="sendButton">
    <property name="geometry">
     <rect>
-     <x>300</x>
-     <y>250</y>
+     <x>460</x>
+     <y>370</y>
      <width>75</width>
      <height>23</height>
     </rect>
@@ -63,10 +63,10 @@ background-color:#c5fdff;
   <widget class="QLabel" name="label">
    <property name="geometry">
     <rect>
-     <x>50</x>
-     <y>30</y>
-     <width>151</width>
-     <height>161</height>
+     <x>160</x>
+     <y>70</y>
+     <width>191</width>
+     <height>251</height>
     </rect>
    </property>
    <property name="text">
@@ -82,10 +82,10 @@ background-color:#c5fdff;
   <widget class="QLabel" name="labelYourMessage">
    <property name="geometry">
     <rect>
-     <x>200</x>
-     <y>30</y>
-     <width>171</width>
-     <height>161</height>
+     <x>350</x>
+     <y>70</y>
+     <width>191</width>
+     <height>251</height>
     </rect>
    </property>
    <property name="text">
@@ -93,6 +93,37 @@ background-color:#c5fdff;
    </property>
    <property name="alignment">
     <set>Qt::AlignBottom|Qt::AlignRight|Qt::AlignTrailing</set>
+   </property>
+  </widget>
+  <widget class="QListWidget" name="listWidget">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>70</y>
+     <width>161</width>
+     <height>291</height>
+    </rect>
+   </property>
+  </widget>
+  <widget class="QLabel" name="titleLabel">
+   <property name="geometry">
+    <rect>
+     <x>16</x>
+     <y>40</y>
+     <width>501</width>
+     <height>31</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>12</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="alignment">
+    <set>Qt::AlignCenter</set>
    </property>
   </widget>
  </widget>

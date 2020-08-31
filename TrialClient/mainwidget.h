@@ -1,6 +1,7 @@
 #ifndef MAINWIDGET_H
 #define MAINWIDGET_H
 
+#include "newaccount.h"
 #include "login.h"
 #include "dialog.h"
 #include "client.h"
@@ -18,16 +19,20 @@ class MainWidget : public QDialog
 public:
     explicit MainWidget(QWidget *parent = nullptr);
     ~MainWidget();
-    Client client;
+    Client *client;
 
 private slots:
     void on_mainLogInButton_clicked();
-    void showDialog();
+    void showDialog(const QJsonArray& userArray);
+    void requestUserList();
+
+    void on_newAccountButton_clicked();
 
 private:
     Ui::MainWidget *ui;
     Dialog *dialog;
     Login *login;
+    NewAccount *newAccount;
 };
 
 #endif // MAINWIDGET_H

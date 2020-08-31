@@ -9,6 +9,8 @@
 #include "string"
 #include "vector"
 #include <QSet>
+#include "dbmanager.h"
+#include "messagesdbmanager.h"
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -36,6 +38,7 @@ public:
 
 private slots:
     void jsonReceived();
+    void deleteUser();
 
 signals:
     void processMessageSignal(std::string s);
@@ -43,9 +46,14 @@ signals:
 private:
     void messageReceived(const QJsonObject& json);
     void processLogin(const QJsonObject& json,  QTcpSocket* sender);
+    void processNewAccount(const QJsonObject& json,  QTcpSocket* sender);
     void processMessage(const QJsonObject& json, QTcpSocket* sender);
-    QTcpServer *tcpServer = nullptr;
-    QSet<ClientData*> clients;
+    void sendUsersList(QTcpSocket* sender);
+    void sendUserIdbyLogin(const QJsonObject& json, QTcpSocket* sender);
+    std::unique_ptr<QTcpServer> tcpServer;
+    std::vector<ClientData*> clients;
+    std::unique_ptr<DBManager> db;
+    std::unique_ptr<MessagesDBManager> messagesDB;
 
 };
 

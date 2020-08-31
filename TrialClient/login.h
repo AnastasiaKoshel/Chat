@@ -21,7 +21,7 @@ signals:
     void logInSuccess();
 
 private slots:
-
+    void loginSignalReceived(std::string status);
     void on_loginButton_clicked();
 
 private:
