@@ -70,14 +70,11 @@ void Dialog::displayChat(int myId, int otherId)
         if(curMessage.isMyMessage && !curMessage.text.empty())
         {
             myMessageText += (curMessage.text + "\n");
-            //qDebug()<<"My message "<<myMessageText.c_str();
-            //std::string fillerMessage('_', curMessage.text.length());
             otherMessageText += "\n";
         }
         else
         {
             otherMessageText += (curMessage.text  + "\n");
-            //std::string fillerMessage('_', curMessage.text.length());
             myMessageText += "\n";
         }
 

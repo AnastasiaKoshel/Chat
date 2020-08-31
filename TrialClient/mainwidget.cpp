@@ -31,7 +31,7 @@ void MainWidget::requestUserList()
 {
     client->requestAllUsers();
 }
-void MainWidget::showDialog(QJsonArray userArray)
+void MainWidget::showDialog(const QJsonArray& userArray)
 {
     dialog = new Dialog(client, userArray);
     qDebug()<<"Entered Show Dialog";

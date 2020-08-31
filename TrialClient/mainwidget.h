@@ -23,7 +23,7 @@ public:
 
 private slots:
     void on_mainLogInButton_clicked();
-    void showDialog(QJsonArray userArray);
+    void showDialog(const QJsonArray& userArray);
     void requestUserList();
 
     void on_newAccountButton_clicked();

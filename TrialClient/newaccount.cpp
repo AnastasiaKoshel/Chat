@@ -12,7 +12,7 @@ NewAccount::NewAccount(Client *cl, QWidget *parent) :
 
 NewAccount::~NewAccount()
 {
-    delete ui;
+    delete ui;//TODO: fix it
 }
 
 void NewAccount::newAccountSignalReceived(std::string status)
@@ -33,6 +33,7 @@ void NewAccount::newAccountSignalReceived(std::string status)
 
 void NewAccount::on_okButton_clicked()
 {
+    //TODO: add const
     QString login = ui->loginLine->text();
     QString password1 = ui->passwordLine1->text();
     QString password2 = ui->passwordLine2->text();

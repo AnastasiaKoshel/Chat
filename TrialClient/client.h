@@ -36,10 +36,10 @@ public:
     void processJson();
     void requestAllUsers();
 
-    void setLogin(const std::string login) {myLogin = login;}
-    std::string getLogin() {return myLogin;}
+    void setLogin(const std::string login)  {myLogin = login;}
+    std::string getLogin() const {return myLogin;}
     void setCurrentChatLogin(const std::string login ) {currentChatLogin = login;}
-    std::string getCurrentChatLogin() { return currentChatLogin;}
+    std::string getCurrentChatLogin() const { return currentChatLogin;}
 
     void getSelectedChat();
     std::string messageCur;
@@ -51,7 +51,7 @@ signals:
     void disconnected();
     void loginJsonSignal(std::string status);
     void newAccountSignal(std::string status);
-    void userListReceived(QJsonArray usersArray);
+    void userListReceived(const QJsonArray& usersArray);
     void userIdbyLoginSignal(int myId, int otherId);
 
 

@@ -18,6 +18,7 @@ MessagesDataBase::MessagesDataBase()
 std::vector<Message> MessagesDataBase::getMessageHistory(int myID, int otherID)
 {
     std::vector<Message> messageHistory;
+    //reserve space for vector probably we know number of messages
     Message currentMessage;
     QSqlQuery query(messagesDB);
     query.prepare("SELECT * FROM messageData WHERE sender = (:sender) AND receiver = (:receiver)");
@@ -48,15 +49,15 @@ std::vector<Message> MessagesDataBase::getMessageHistory(int myID, int otherID)
     }
     while(query.next())
     {
-        currentMessage.text = query.value(3).toString().toStdString();
+        currentMessage.text = query.value(3).toString().toStdString(); //add name of column to select
         currentMessage.timestamp = query.value(4).toInt();
         currentMessage.isMyMessage = false;
         messageHistory.push_back(currentMessage);
-        qDebug() << "Other mess "<<currentMessage.text.c_str();
+        qDebug() << "Other mess "<<currentMessage.text.c_str(); //probably add QString
 
     }
     sort(messageHistory.begin(), messageHistory.end(),
-        [](const Message& a, const Message& b) -> bool
+        [](const Message& a, const Message& b)
     {
         return a.timestamp < b.timestamp;
     });

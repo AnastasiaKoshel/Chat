@@ -61,14 +61,14 @@ void Server::jsonReceived()
     else if(type == "newAccount"){
         processNewAccount(json.object(), client);
     }
-    else if(type == "getAllUsers"){
+    else if(type == "getAllUsers"){ //add enum and separate header
         sendUsersList(client);
     }
     else if(type == "getUserIdbyLogin")
     {
         sendUserIdbyLogin(json.object(), client);
     }
-    else{
+    else { //TODO: add if type, rename to action
         processMessage(json.object(), client);
     }
 }
@@ -125,6 +125,8 @@ void Server::processNewAccount(const QJsonObject& json,  QTcpSocket* sender)
     const QJsonValue login = json.value("login");
     const QJsonValue password = json.value("password");
 
+
+    //TODO: emit signal
     int id = db->getIDbyLogin(login.toString().toStdString());
 
     QJsonObject messageJson;
