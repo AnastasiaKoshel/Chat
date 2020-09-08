@@ -1,6 +1,9 @@
 #ifndef MESSAGESDATABASE_H
 #define MESSAGESDATABASE_H
+
 #include <QtSQL>
+#include <string>
+
 
 
 struct Message
@@ -19,7 +22,7 @@ public:
 
 private:
     QSqlDatabase messagesDB;
-    const QString path = "C:/Users/Anastasiia_Koshel/SQlite/messageData.db";
+    const std::string path = "C:/Users/Anastasiia_Koshel/SQlite/messageData.db";
 };
 
 #endif // MESSAGESDATABASE_H

@@ -2,13 +2,13 @@
 #include "ui_login.h"
 
 
-Login::Login(Client *cl, QWidget *parent) :
+Login::Login(MessageParser *msParser, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Login),
-    client(cl)
+    messageParser(msParser)
 {
     ui->setupUi(this);
-    connect(client, SIGNAL(loginJsonSignal(std::string)), this, SLOT(loginSignalReceived(std::string)));
+    connect(messageParser, SIGNAL(loginJsonSignal(std::string)), this, SLOT(loginSignalReceived(std::string)));
 }
 
 Login::~Login()
@@ -21,9 +21,7 @@ void Login::loginSignalReceived(std::string status)
     qDebug()<<"entered loginSignalReceived in Login class";
     if(status == "Success")
     {
-        qDebug()<<"My login is: "<< ui->loginLine->text();
-        client->setLogin(ui->loginLine->text().toStdString());
-        emit logInSuccess();
+        emit logInSuccess(ui->loginLine->text().toStdString());
     }
     else
     {
@@ -35,10 +33,10 @@ void Login::loginSignalReceived(std::string status)
 
 void Login::on_loginButton_clicked()
 {
-    QString login = ui->loginLine->text();
-    QString password = ui->passwordLine->text();
+    std::string login = ui->loginLine->text().toStdString();
+    std::string password = ui->passwordLine->text().toStdString();
 
-    client->sendLoginMessage(login.toStdString(), password.toStdString());
+    messageParser->sendLoginMessage(login, password);
 
 }
 

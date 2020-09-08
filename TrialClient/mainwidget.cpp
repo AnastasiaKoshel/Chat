@@ -5,15 +5,17 @@
 MainWidget::MainWidget(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::MainWidget),
-    client(new Client())
+    messageParser(new MessageParser())
 {
-    login = new Login(client);
-    newAccount = new NewAccount(client);
-    client->connectToServer();
+    login = new Login(messageParser);
+    newAccount = new NewAccount(messageParser);
+
     ui->setupUi(this);
-    connect(client, SIGNAL(userListReceived(QJsonArray)), this, SLOT(showDialog(QJsonArray)));
-    connect(login, SIGNAL(logInSuccess()), this, SLOT(requestUserList()));
-    connect(newAccount, SIGNAL(createNewAccountSuccess()), this, SLOT(requestUserList()));
+    connect(messageParser, SIGNAL(userListReceived(QJsonArray)), this, SLOT(showDialog(QJsonArray)));
+
+    connect(login, SIGNAL(logInSuccess(std::string)), this, SLOT(requestUserList(std::string)));
+    connect(newAccount, SIGNAL(createNewAccountSuccess(std::string)), this, SLOT(requestUserList(std::string)));
+
 }
 
 MainWidget::~MainWidget()
@@ -27,13 +29,14 @@ void MainWidget::on_mainLogInButton_clicked()
     this->close();
     login->show();
 }
-void MainWidget::requestUserList()
+void MainWidget::requestUserList(std::string log)
 {
-    client->requestAllUsers();
+    loginStr = log;
+    messageParser->requestAllUsers();
 }
 void MainWidget::showDialog(const QJsonArray& userArray)
 {
-    dialog = new Dialog(client, userArray);
+    dialog = new Dialog(messageParser, userArray, loginStr);
     qDebug()<<"Entered Show Dialog";
     dialog->show();
     login->close();

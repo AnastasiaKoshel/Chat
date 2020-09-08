@@ -4,7 +4,7 @@ DBManager::DBManager()
 {
 
     db = QSqlDatabase::addDatabase("QSQLITE", "ClientData");
-    db.setDatabaseName(path);
+    db.setDatabaseName(path.c_str());
     qDebug() << QSqlDatabase::drivers();
     if (!db.open())
     {
@@ -47,10 +47,10 @@ std::vector<std::string> DBManager::getAllUsers()
     int idName = query.record().indexOf("login");
     while (query.next())
     {
-       QString name = query.value(idName).toString();
-       allLogins.push_back(name.toStdString());
+       std::string name = query.value(idName).toString().toStdString();
+       allLogins.push_back(name);
 
-       qDebug() << name;
+       qDebug() << name.c_str();
     }
     return allLogins;
 }

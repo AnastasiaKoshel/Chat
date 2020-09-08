@@ -3,7 +3,7 @@
 MessagesDataBase::MessagesDataBase()
 {
     messagesDB = QSqlDatabase::addDatabase("QSQLITE", "MessageDB");
-    messagesDB.setDatabaseName(path);
+    messagesDB.setDatabaseName(path.c_str());
     qDebug() << QSqlDatabase::drivers();
     if (!messagesDB.open())
     {
@@ -53,7 +53,7 @@ std::vector<Message> MessagesDataBase::getMessageHistory(int myID, int otherID)
         currentMessage.timestamp = query.value(4).toInt();
         currentMessage.isMyMessage = false;
         messageHistory.push_back(currentMessage);
-        qDebug() << "Other mess "<<currentMessage.text.c_str(); //probably add QString
+        qDebug() << "Other mess "<<currentMessage.text.c_str(); //probably add std::string
 
     }
     sort(messageHistory.begin(), messageHistory.end(),
