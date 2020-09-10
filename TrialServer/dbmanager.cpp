@@ -18,6 +18,7 @@ DBManager::DBManager()
 
 bool DBManager::addClient(std::string login, std::string password)
 {
+    password = encryptPassword(password);
     bool success = false;
     // you should check if args are ok first...
     QSqlQuery query(db);
@@ -67,6 +68,7 @@ int DBManager::getIDbyLogin(std::string login)
     }
     while(query.next())
     {
+        //TODO: get rid of hardcode index
         qDebug() << "Login: " << query.value(0).toString();
         qDebug() << "Password: " << query.value(1).toString();
         return query.value(0).toInt();;
@@ -89,8 +91,48 @@ bool DBManager::loginAndPasswordMatch(std::string login, std::string password)
         qDebug() << "Login from DB: " << query.value(1).toString()<< " Login income: "<<login.c_str();
         qDebug() << "Password: " << query.value(2).toString()<<" Password income: "<<password.c_str() ;
 
-        if(query.value(2).toString().toStdString() == password )
+        std::string curPassword = decryptPassword(query.value(2).toString().toStdString());
+
+        if(curPassword == password )
             return true;
     }
     return false;
+    //TODO: disable connect button when already connected
 }
+
+std::string DBManager::encryptPassword(std::string password)
+{
+
+    qDebug()<<"incomming password in encrypt "<<password.c_str();
+    int step=3;
+    std::string result;
+    for(char cur:password)
+    {
+        int curInt = cur - '0';
+        curInt += step;
+        curInt = curInt % 128;
+        result += (curInt+'0');
+
+    }
+    qDebug()<<"outcomming password in encrypt "<<result.c_str();
+    return result;
+}
+
+std::string DBManager::decryptPassword(std::string password)
+{
+    qDebug()<<"incomming password in decrypt "<<password.c_str();
+    int step=3;
+    std::string result;
+    for(char cur:password)
+    {
+        int curInt = cur - '0';
+        curInt -= step;
+        curInt = curInt % 128;
+        result += (curInt+'0');
+
+    }
+    qDebug()<<"outcomming password in decrypt "<<result.c_str();
+    return result;
+
+}
+

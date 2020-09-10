@@ -12,6 +12,8 @@ public:
     int getIDbyLogin(std::string login);
     bool loginAndPasswordMatch(std::string login, std::string password);
     std::vector<std::string> getAllUsers();
+    std::string decryptPassword(std::string password);
+    std::string encryptPassword(std::string password);
 
 
 private:
