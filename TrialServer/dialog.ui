@@ -39,7 +39,7 @@ background-color: #c5fdff;
   <widget class="QPushButton" name="connectButton">
    <property name="geometry">
     <rect>
-     <x>0</x>
+     <x>10</x>
      <y>0</y>
      <width>75</width>
      <height>23</height>

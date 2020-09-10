@@ -74,11 +74,12 @@ void Server::jsonReceived()
 
 void Server::deleteUser()
 {
+    qDebug()<<"clients array size ="<<clients.size();
     for (size_t i = 0; i < clients.size(); ++i)
     {
         if(clients[i]->clientSocket->socketDescriptor() == ((QTcpSocket*)sender())->socketDescriptor())
         {
-            clients.erase(clients.begin()+i-1, clients.begin()+i);
+            clients.erase(clients.begin()+i);
             return;
         }
     }
