@@ -26,15 +26,13 @@ public:
 private slots:
 
     void on_sendButton_clicked();
-    void displayMessage(std::string message, std::string senderLogin);
-    void displayChat(int myId, int otherId);
-
+    void displayMessage(const std::string& message, const std::string& senderLogin);
+    void displayChat(const int myId, const int otherId);
     void on_listWidget_itemClicked(QListWidgetItem *item);
-signals:
-    void setCurChatLogin(std::string chatLogin);
+
 
 private:
-    Ui::Dialog *ui;
+    std::unique_ptr<Ui::Dialog> ui;
     MessageParser *messageParser;
     std::unique_ptr<MessagesDataBase> db;
     QJsonArray usersList;

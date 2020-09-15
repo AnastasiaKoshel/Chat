@@ -22,14 +22,14 @@ public:
     ~Login();
 
 signals:
-    void logInSuccess(std::string login);
+    void logInSuccess(const std::string& login);
 
 private slots:
-    void loginSignalReceived(std::string status);
+    void loginSignalReceived(const std::string& status);
     void on_loginButton_clicked();
 
 private:
-    Ui::Login *ui;
+    std::unique_ptr<Ui::Login> ui;
     MessageParser *messageParser;
 
 };

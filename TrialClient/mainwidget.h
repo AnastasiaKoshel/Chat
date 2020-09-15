@@ -27,12 +27,12 @@ public:
 private slots:
     void on_mainLogInButton_clicked();
     void showDialog(const QJsonArray& userArray);
-    void requestUserList(std::string login);
+    void requestUserList(const std::string& login);
 
     void on_newAccountButton_clicked();
 
 private:
-    Ui::MainWidget *ui;
+    std::unique_ptr<Ui::MainWidget> ui;
     Dialog *dialog;
     Login *login;
     NewAccount *newAccount;

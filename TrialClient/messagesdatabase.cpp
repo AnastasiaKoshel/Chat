@@ -15,7 +15,7 @@ MessagesDataBase::MessagesDataBase()
     }
 }
 
-std::vector<Message> MessagesDataBase::getMessageHistory(int myID, int otherID)
+std::vector<Message> MessagesDataBase::getMessageHistory(const int myID, const int otherID)
 {
     std::vector<Message> messageHistory;
     //reserve space for vector probably we know number of messages

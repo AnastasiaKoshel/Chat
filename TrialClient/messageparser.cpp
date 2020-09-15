@@ -10,7 +10,7 @@ MessageParser::MessageParser(QObject *parent)
     connect(this, SIGNAL(sendJSON(QJsonObject&)), client, SLOT(sendJSON(QJsonObject&)));
 }
 
-void MessageParser::sendTextMessage(std::string text, std::string login, std::string chatLogin)
+void MessageParser::sendTextMessage(const std::string& text, const std::string& login, const std::string& chatLogin)
 {
     qDebug() << "Send message";
 
@@ -23,7 +23,7 @@ void MessageParser::sendTextMessage(std::string text, std::string login, std::st
     emit sendJSON(messageJson);
 }
 
-void MessageParser::sendLoginMessage(std::string login, std::string password)
+void MessageParser::sendLoginMessage(const std::string& login, const std::string& password)
 {
     qDebug() << "Send login message";
 
@@ -36,7 +36,7 @@ void MessageParser::sendLoginMessage(std::string login, std::string password)
     emit sendJSON(messageJson);
 }
 
-void MessageParser::sendNewAccountMessage(std::string login, std::string password)
+void MessageParser::sendNewAccountMessage(const std::string& login, const std::string& password)
 {
     qDebug() << "Send login message";
 
@@ -49,7 +49,7 @@ void MessageParser::sendNewAccountMessage(std::string login, std::string passwor
 }
 
 
-void MessageParser::getSelectedChat(std::string login, std::string chatLogin)
+void MessageParser::getSelectedChat(const std::string& login, const std::string& chatLogin)
 {
     qDebug() << "Entered getSelectedChat and my login is "<<login.c_str();
 

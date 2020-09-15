@@ -16,7 +16,7 @@ MessagesDBManager::MessagesDBManager()
 }
 
 
-bool MessagesDBManager::writeMessageToDB(std::string message, int senderID, int recipientID)
+bool MessagesDBManager::writeMessageToDB(const std::string& message, const int senderID, const int recipientID)
 {
     qDebug()<<"Entered writeMessageToDB message:"<<message.c_str()<<" senderID:"<<senderID<<" recipientID:"<<recipientID;
     if(!senderID || !recipientID)

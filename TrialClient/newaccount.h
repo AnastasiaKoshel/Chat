@@ -21,14 +21,14 @@ public:
 
 
 signals:
-    void createNewAccountSuccess(std::string login);
+    void createNewAccountSuccess(const std::string& login);
 
 private slots:
-    void newAccountSignalReceived(std::string status);
+    void newAccountSignalReceived(const std::string& status);
     void on_okButton_clicked();
 
 private:
-    Ui::NewAccount *ui;
+    std::unique_ptr<Ui::NewAccount> ui;
     MessageParser *messageParser;
 
 };

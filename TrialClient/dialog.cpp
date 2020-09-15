@@ -4,11 +4,11 @@
 
 Dialog::Dialog(MessageParser *msParser, QJsonArray usersArray, std::string login, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::Dialog),
     messageParser(msParser),
     usersList(usersArray),
     login(login)
 {
+    ui = std::make_unique<Ui::Dialog>();
     ui->setupUi(this);
     db = std::make_unique<MessagesDataBase>();
 
@@ -20,13 +20,13 @@ Dialog::Dialog(MessageParser *msParser, QJsonArray usersArray, std::string login
     }
 
 
-    connect(messageParser, SIGNAL(processMessageSignal(std::string, std::string)), this, SLOT(displayMessage(std::string, std::string)));
-    connect(messageParser, SIGNAL(userIdbyLoginSignal(int, int)), this, SLOT(displayChat(int, int)));
+    connect(messageParser, SIGNAL(processMessageSignal(const std::string&, const std::string&)),
+            this, SLOT(displayMessage(const std::string&, const std::string&)));
+    connect(messageParser, SIGNAL(userIdbyLoginSignal(const int, const int)), this, SLOT(displayChat(const int, const int)));
 }
 
 Dialog::~Dialog()
 {
-    delete ui;
 }
 
 void Dialog::on_sendButton_clicked()
@@ -38,7 +38,7 @@ void Dialog::on_sendButton_clicked()
     ui->textEdit->clear();
 }
 
-void Dialog::displayMessage(std::string message, std::string senderLogin)
+void Dialog::displayMessage(const std::string& message, const std::string& senderLogin)
 {
     qDebug()<<"curChatLogin "<<chatLogin.c_str()<<" recipient Login "<<senderLogin.c_str();
     if(chatLogin == senderLogin)
@@ -62,7 +62,7 @@ void Dialog::on_listWidget_itemClicked(QListWidgetItem *item)
    // displayChat();
 }
 
-void Dialog::displayChat(int myId, int otherId)
+void Dialog::displayChat(const int myId, const int otherId)
 {
     std::vector<Message> messageHistory = db->getMessageHistory(myId, otherId);
     std::string myMessageText="";

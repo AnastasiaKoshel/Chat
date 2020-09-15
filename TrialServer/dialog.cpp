@@ -35,7 +35,7 @@ void Dialog::on_connectButton_clicked()
 }
 
 
-void Dialog::displayMessage(const std::string s)
+void Dialog::displayMessage(const std::string& s)
 {
      ui->label->setText(ui->label->text() + '\n' +s.c_str());
 }

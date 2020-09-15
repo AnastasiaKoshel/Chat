@@ -23,7 +23,7 @@ DBManager::DBManager()
     }
 }
 
-bool DBManager::addClient(const std::string login, std::string password)
+bool DBManager::addClient(const std::string& login, std::string password)
 {
     if(login.empty() || password.empty())
         return false;
@@ -71,7 +71,7 @@ std::vector<std::string> DBManager::getAllUsers()
     return allLogins;
 }
 
-int DBManager::getIDbyLogin(const std::string login)
+int DBManager::getIDbyLogin(const std::string& login)
 {
     QSqlQuery query(db);
     query.prepare(selectClientByLoginQuery);
@@ -94,7 +94,7 @@ int DBManager::getIDbyLogin(const std::string login)
     return 0;
 }
 
-bool DBManager::loginAndPasswordMatch(const std::string login, const std::string password)
+bool DBManager::loginAndPasswordMatch(const std::string& login, const std::string& password)
 {
     QSqlQuery query(db);
     query.prepare(selectClientByLoginQuery);

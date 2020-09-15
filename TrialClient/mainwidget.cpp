@@ -4,23 +4,22 @@
 
 MainWidget::MainWidget(QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::MainWidget),
     messageParser(new MessageParser())
 {
+    ui = std::make_unique<Ui::MainWidget>();
     login = new Login(messageParser);
     newAccount = new NewAccount(messageParser);
 
     ui->setupUi(this);
     connect(messageParser, SIGNAL(userListReceived(QJsonArray)), this, SLOT(showDialog(QJsonArray)));
 
-    connect(login, SIGNAL(logInSuccess(std::string)), this, SLOT(requestUserList(std::string)));
-    connect(newAccount, SIGNAL(createNewAccountSuccess(std::string)), this, SLOT(requestUserList(std::string)));
+    connect(login, SIGNAL(logInSuccess(const std::string&)), this, SLOT(requestUserList(const std::string&)));
+    connect(newAccount, SIGNAL(createNewAccountSuccess(const std::string&)), this, SLOT(requestUserList(const std::string&)));
 
 }
 
 MainWidget::~MainWidget()
 {
-    delete ui;
 }
 
 
@@ -29,7 +28,7 @@ void MainWidget::on_mainLogInButton_clicked()
     this->close();
     login->show();
 }
-void MainWidget::requestUserList(std::string log)
+void MainWidget::requestUserList(const std::string& log)
 {
     loginStr = log;
     messageParser->requestAllUsers();

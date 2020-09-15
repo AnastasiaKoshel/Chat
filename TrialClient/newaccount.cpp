@@ -6,16 +6,16 @@ NewAccount::NewAccount(MessageParser *msParser, QWidget *parent) :
     ui(new Ui::NewAccount),
     messageParser(msParser)
 {
+    ui = std::make_unique<Ui::NewAccount>();
     ui->setupUi(this);
-    connect(messageParser, SIGNAL(newAccountSignal(std::string)), this, SLOT(newAccountSignalReceived(std::string)));
+    connect(messageParser, SIGNAL(newAccountSignal(const std::string&)), this, SLOT(newAccountSignalReceived(const std::string&)));
 }
 
 NewAccount::~NewAccount()
 {
-    delete ui;//TODO: fix it
 }
 
-void NewAccount::newAccountSignalReceived(std::string status)
+void NewAccount::newAccountSignalReceived(const std::string& status)
 {
     if(status == "Success")
     {

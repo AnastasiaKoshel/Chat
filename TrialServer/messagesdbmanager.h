@@ -8,7 +8,7 @@ class MessagesDBManager
 public:
     MessagesDBManager();
     const std::string path = "C:/Users/Anastasiia_Koshel/SQlite/messageData.db";
-    bool writeMessageToDB(std::string message, int senderID, int recipientID);
+    bool writeMessageToDB(const std::string& message, const int senderID, const int recipientID);
 
 private:
     QSqlDatabase messagesDB;

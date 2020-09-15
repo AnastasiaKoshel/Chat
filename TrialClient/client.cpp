@@ -45,10 +45,7 @@ void Client::sendJSON(QJsonObject& json)
 //errors will be handeled later
 void Client::displayError(QAbstractSocket::SocketError socketError)
 {
-    switch (socketError) {
-    case QAbstractSocket::RemoteHostClosedError:
-        break;
-    }
+    qDebug()<<"[ERROR] SocketError: "<<socketError;
 }
 
 
