@@ -22,20 +22,20 @@ void Dialog::on_quitButton_clicked()
 
 void Dialog::on_connectButton_clicked()
 {
-    bool serverInitSuccess = server.initServer();
+    const bool serverInitSuccess = server.initServer();
     if(serverInitSuccess)
     {
         ui->label->setText("Server init succes");
         ui->connectButton->setEnabled(false);
     }
-     bool success = connect(&server, SIGNAL(processMessageSignal(std::string)), this, SLOT(displayMessage(std::string)));
+     const bool success = connect(&server, SIGNAL(processMessageSignal(std::string)), this, SLOT(displayMessage(std::string)));
      if(!success)
         ui->label->setText("failed connecting to displayMessage");
 
 }
 
 
-void Dialog::displayMessage(std::string s)
+void Dialog::displayMessage(const std::string s)
 {
      ui->label->setText(ui->label->text() + '\n' +s.c_str());
 }

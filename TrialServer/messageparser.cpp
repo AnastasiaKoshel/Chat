@@ -1,4 +1,5 @@
 #include "messageparser.h"
+#include "jsonType.h"
 
 MessageParser::MessageParser()
 {
@@ -8,7 +9,7 @@ MessageParser::MessageParser()
 void MessageParser::processUsersList(QTcpSocket* sender)
 {
     QJsonObject messageJson;
-    messageJson["type"]="userList";
+    messageJson["type"]=JSONType::USER_LIST;
     QJsonArray usersArray;
     std::vector<std::string> usersVector = passwordLoginDB->getAllUsers();
     for(auto user : usersVector )
@@ -30,7 +31,7 @@ void MessageParser::processLogin(const QJsonObject& json,  QTcpSocket* sender, s
             passwordLoginDB->loginAndPasswordMatch(login.toString().toStdString(), password.toString().toStdString());
 
     QJsonObject messageJson;
-    messageJson["type"] = "login";
+    messageJson["type"] = JSONType::LOGIN;
     if(ifLoginMatchPassword)
         messageJson["status"] = "Success";
     else
@@ -63,7 +64,7 @@ void MessageParser::processNewAccount(const QJsonObject& json,  QTcpSocket* send
     int id = passwordLoginDB->getIDbyLogin(login.toString().toStdString());
 
     QJsonObject messageJson;
-    messageJson["type"] = "newAccount";
+    messageJson["type"] = JSONType::NEW_ACCOUNT;
     if(id)
     {
        messageJson["status"] = "Fail";
@@ -97,9 +98,9 @@ void MessageParser::processMessage(const QJsonObject& json, std::vector<ClientDa
     messagesDB->writeMessageToDB(message, passwordLoginDB->getIDbyLogin(senderLogin),passwordLoginDB->getIDbyLogin(recipientLogin));
 
     QJsonObject messageJson;
-    messageJson["type"] = "message";
+    messageJson["type"] = JSONType::MESSAGE;
     messageJson["text"] = message.c_str();
-    messageJson["recipientLogin"] = recipientLogin.c_str();
+    messageJson["senderLogin"] = senderLogin.c_str();
     const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
 
     //const int recipient = json.value("recipientID").toInt();
@@ -123,10 +124,10 @@ void MessageParser::processUserIdbyLogin(const QJsonObject& json, QTcpSocket* se
     int id1 = passwordLoginDB->getIDbyLogin(login1);
     int id2 = passwordLoginDB->getIDbyLogin(login2);
 
-    //qDebug()<<"Received logins "<<login1<<" and "<<login2<<" Return ids "<<id1<<" and "<<id2;
+    qDebug()<<"Received logins "<<login1.c_str()<<" and "<<login2.c_str()<<" Return ids "<<id1<<" and "<<id2;
 
     QJsonObject messageJson;
-    messageJson["type"] = "getUserIdbyLogin";
+    messageJson["type"] = JSONType::USER_ID_BY_LOGIN;
     messageJson["id1"] = id1;
     messageJson["id2"] = id2;
 

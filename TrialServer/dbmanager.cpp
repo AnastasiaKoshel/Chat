@@ -1,5 +1,12 @@
 #include "dbmanager.h"
 
+namespace
+{
+    const char* addClientQuery = "INSERT INTO clientData (id, login, password) VALUES (NULL, :login, :password)";
+    const char* getAllUsersQuery = "SELECT * FROM clientData";
+    const char* selectClientByLoginQuery = "SELECT * FROM clientData WHERE login = (:login)";
+}
+
 DBManager::DBManager()
 {
 
@@ -16,13 +23,16 @@ DBManager::DBManager()
     }
 }
 
-bool DBManager::addClient(std::string login, std::string password)
+bool DBManager::addClient(const std::string login, std::string password)
 {
+    if(login.empty() || password.empty())
+        return false;
+
     password = encryptPassword(password);
     bool success = false;
-    // you should check if args are ok first...
+    // TODO: you should check if args are ok first...
     QSqlQuery query(db);
-    query.prepare("INSERT INTO clientData (id, login, password) VALUES (NULL, :login, :password)");
+    query.prepare(addClientQuery);
     query.bindValue(":login", login.c_str());
     query.bindValue(":password", password.c_str());
     query.bindValue(":id", 0);
@@ -32,23 +42,28 @@ bool DBManager::addClient(std::string login, std::string password)
     }
     else
     {
-         qDebug() << "addPerson error:  "
+         qDebug() << "[DataBase] addPerson error:  "
                   << query.lastError();
     }
-    // printAll();
     return success;
 }
 std::vector<std::string> DBManager::getAllUsers()
 {
     std::vector<std::string> allLogins;
-     qDebug() << "Enter getAllUsers in server";
     QSqlQuery query(db);
-    query.prepare("SELECT * FROM clientData");
-    query.exec();
-    int idName = query.record().indexOf("login");
+    query.prepare(getAllUsersQuery);
+
+    if(!query.exec())
+    {
+        qDebug() << "[DataBase] Get All Users fro DB error:  "
+                 << query.lastError();
+        return allLogins;
+    }
+
+    const int loginInd = query.record().indexOf("login");
     while (query.next())
     {
-       std::string name = query.value(idName).toString().toStdString();
+       const std::string name = query.value(loginInd).toString().toStdString();
        allLogins.push_back(name);
 
        qDebug() << name.c_str();
@@ -56,48 +71,55 @@ std::vector<std::string> DBManager::getAllUsers()
     return allLogins;
 }
 
-int DBManager::getIDbyLogin(std::string login)
+int DBManager::getIDbyLogin(const std::string login)
 {
     QSqlQuery query(db);
-    query.prepare("SELECT * FROM clientData WHERE login = (:login)");
+    query.prepare(selectClientByLoginQuery);
     query.bindValue(":login", login.c_str());
+
     if( !query.exec() )
     {
-        qDebug() << "Error getting user info from DB";
+        qDebug() << "[DataBase] Error getting user info from DB" << query.lastError();
         return 0;
     }
+
+    const int loginInd = query.record().indexOf("login");
+    const int passwordInd = query.record().indexOf("password");
     while(query.next())
     {
-        //TODO: get rid of hardcode index
-        qDebug() << "Login: " << query.value(0).toString();
-        qDebug() << "Password: " << query.value(1).toString();
+        qDebug() << "Login: " << query.value(loginInd).toString();
+        qDebug() << "Password: " << query.value(passwordInd).toString();
         return query.value(0).toInt();;
     }
     return 0;
 }
 
-bool DBManager::loginAndPasswordMatch(std::string login, std::string password)
+bool DBManager::loginAndPasswordMatch(const std::string login, const std::string password)
 {
     QSqlQuery query(db);
-    query.prepare("SELECT * FROM clientData WHERE login = (:login)");
+    query.prepare(selectClientByLoginQuery);
     query.bindValue(":login", login.c_str());
+
     if( !query.exec() )
     {
         qDebug() << "Error getting user info from DB";
         return false;
     }
+
+    const int loginInd = query.record().indexOf("login");
+    const int passwordInd = query.record().indexOf("password");
+
     while(query.next())
     {
-        qDebug() << "Login from DB: " << query.value(1).toString()<< " Login income: "<<login.c_str();
-        qDebug() << "Password: " << query.value(2).toString()<<" Password income: "<<password.c_str() ;
+        qDebug() << "Login from DB: " << query.value(loginInd).toString()<< " Login income: "<<login.c_str();
+        qDebug() << "Password: " << query.value(passwordInd).toString()<<" Password income: "<<password.c_str() ;
 
-        std::string curPassword = decryptPassword(query.value(2).toString().toStdString());
+        const std::string curPassword = decryptPassword(query.value(passwordInd).toString().toStdString());
 
         if(curPassword == password )
             return true;
     }
     return false;
-    //TODO: disable connect button when already connected
 }
 
 std::string DBManager::encryptPassword(std::string password)

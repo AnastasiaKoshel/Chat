@@ -18,13 +18,12 @@ MessagesDBManager::MessagesDBManager()
 
 bool MessagesDBManager::writeMessageToDB(std::string message, int senderID, int recipientID)
 {
-    //qDebug()<<"Entered writeMessageToDB message:"<<message<<" senderID:"<<senderID<<" recipientID:"<<recipientID;
+    qDebug()<<"Entered writeMessageToDB message:"<<message.c_str()<<" senderID:"<<senderID<<" recipientID:"<<recipientID;
     if(!senderID || !recipientID)
     {
         qDebug()<<"No such user";
         return false;
     }
-
 
     qint64 timestamp = QDateTime::currentSecsSinceEpoch();
     QSqlQuery query(messagesDB);
@@ -43,9 +42,7 @@ bool MessagesDBManager::writeMessageToDB(std::string message, int senderID, int 
     }
     else
     {
-         qDebug() << "insert message error:  "
-                  << query.lastError();
+         qDebug() << "insert message error:  "<< query.lastError();
     }
-    // printAll();
     return false;
 }

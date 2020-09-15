@@ -2,10 +2,9 @@
 #include "ui_dialog.h"
 
 
-Dialog::Dialog(MessageParser *msParser, /*Client *cl,*/ QJsonArray usersArray, std::string login, QWidget *parent) :
+Dialog::Dialog(MessageParser *msParser, QJsonArray usersArray, std::string login, QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog),
-    //client(cl),
     messageParser(msParser),
     usersList(usersArray),
     login(login)
@@ -39,10 +38,10 @@ void Dialog::on_sendButton_clicked()
     ui->textEdit->clear();
 }
 
-void Dialog::displayMessage(std::string message, std::string recipientLogin)
+void Dialog::displayMessage(std::string message, std::string senderLogin)
 {
-    qDebug()<<"curChatLogin "<<login.c_str()<<" recipient Login "<<recipientLogin.c_str();
-    if(login == recipientLogin)
+    qDebug()<<"curChatLogin "<<chatLogin.c_str()<<" recipient Login "<<senderLogin.c_str();
+    if(chatLogin == senderLogin)
     {
         std::string curMessage = ui->label->text().toStdString();
         curMessage += "\n";

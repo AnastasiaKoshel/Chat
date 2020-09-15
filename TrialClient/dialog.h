@@ -26,7 +26,7 @@ public:
 private slots:
 
     void on_sendButton_clicked();
-    void displayMessage(std::string message, std::string recipientLogin);
+    void displayMessage(std::string message, std::string senderLogin);
     void displayChat(int myId, int otherId);
 
     void on_listWidget_itemClicked(QListWidgetItem *item);

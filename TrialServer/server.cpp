@@ -3,7 +3,7 @@
 #include <QtCore>
 #include "dialog.h"
 #include "server.h"
-
+#include "jsonType.h"
 
 Server::Server(QObject *parent)
     : QTcpServer(parent)
@@ -54,21 +54,25 @@ void Server::jsonReceived()
     const QJsonDocument json = QJsonDocument::fromJson(jsonData, &parseError);
     const QJsonValue action = json.object().value("type");
     qDebug()<<"jSonType "<<action;
-    if(action == "login")
-        parser->processLogin(json.object(), client, clients);
-    else if(action == "newAccount"){
-        parser->processNewAccount(json.object(), client, clients);
-    }
-    else if(action == "getAllUsers"){ //add enum and separate header
-        parser->processUsersList(client);
-    }
-    else if(action == "getUserIdbyLogin")
+    switch(JSONType(action.toInt()))
     {
-        parser->processUserIdbyLogin(json.object(), client);
+        case LOGIN:
+            parser->processLogin(json.object(), client, clients);
+            break;
+        case NEW_ACCOUNT:
+            parser->processNewAccount(json.object(), client, clients);
+            break;
+        case USER_LIST:
+            parser->processUsersList(client);
+            break;
+        case USER_ID_BY_LOGIN:
+            parser->processUserIdbyLogin(json.object(), client);
+            break;
+        case MESSAGE:
+            parser->processMessage(json.object(), clients);
+            break;
     }
-    else if(action == "message"){
-        parser->processMessage(json.object(), clients);
-    }
+
 }
 
 

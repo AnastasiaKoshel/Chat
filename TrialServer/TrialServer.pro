@@ -3,6 +3,7 @@ QT += network widgets \
 
 HEADERS       = dialog.h \
                 dbmanager.h \
+                jsonType.h \
                 messageparser.h \
                 server.h \
                 messagesdbmanager.h

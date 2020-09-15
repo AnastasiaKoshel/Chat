@@ -1,4 +1,5 @@
 #include "messageparser.h"
+#include "jsonType.h"
 
 MessageParser::MessageParser(QObject *parent)
     : QObject(parent),
@@ -14,7 +15,7 @@ void MessageParser::sendTextMessage(std::string text, std::string login, std::st
     qDebug() << "Send message";
 
     QJsonObject messageJson;
-    messageJson["type"] = "message";
+    messageJson["type"] = JSONType::MESSAGE;
     messageJson["value"] = text.c_str();
     messageJson["recipientLogin"] = chatLogin.c_str();
     messageJson["senderLogin"] = login.c_str();
@@ -27,7 +28,7 @@ void MessageParser::sendLoginMessage(std::string login, std::string password)
     qDebug() << "Send login message";
 
     QJsonObject messageJson;
-    messageJson["type"] = "login";
+    messageJson["type"] = JSONType::LOGIN;
     messageJson["login"] = login.c_str();
     messageJson["password"] = password.c_str();
 
@@ -40,7 +41,7 @@ void MessageParser::sendNewAccountMessage(std::string login, std::string passwor
     qDebug() << "Send login message";
 
     QJsonObject messageJson;
-    messageJson["type"] = "newAccount";
+    messageJson["type"] = JSONType::NEW_ACCOUNT;
     messageJson["login"] = login.c_str();
     messageJson["password"] = password.c_str();
 
@@ -53,7 +54,7 @@ void MessageParser::getSelectedChat(std::string login, std::string chatLogin)
     qDebug() << "Entered getSelectedChat and my login is "<<login.c_str();
 
     QJsonObject messageJson;
-    messageJson["type"] = "getUserIdbyLogin";
+    messageJson["type"] = JSONType::USER_ID_BY_LOGIN;
     messageJson["myLogin"] = login.c_str();
     messageJson["otherLogin"] = chatLogin.c_str();
 
@@ -63,7 +64,7 @@ void MessageParser::getSelectedChat(std::string login, std::string chatLogin)
 void MessageParser::requestAllUsers()
 {
     QJsonObject messageJson;
-    messageJson["type"] ="getAllUsers";
+    messageJson["type"] =JSONType::USER_LIST;
     emit sendJSON(messageJson);
 }
 
@@ -71,28 +72,50 @@ void MessageParser::processJson(QJsonObject& object)
 {
     QJsonValue action = object.value("type");
     qDebug()<<"jSonType "<<action;
-    if(action == "login")
+    switch(JSONType(action.toInt()))
+    {
+        case LOGIN:
+            emit loginJsonSignal(object.value("status").toString().toStdString());
+            break;
+        case NEW_ACCOUNT:
+            emit newAccountSignal(object.value("status").toString().toStdString());
+            break;
+        case USER_LIST:
+            emit userListReceived(object.value("userList").toArray());
+            break;
+        case USER_ID_BY_LOGIN:
+            emit userIdbyLoginSignal(object.value("id1").toInt(),
+                                     object.value("id2").toInt());
+            break;
+        case MESSAGE:
+            emit processMessageSignal(object.value("text").toString().toStdString(),
+                                      object.value("senderLogin").toString().toStdString());
+            break;
+    }
+
+    if(action == JSONType::LOGIN)
     {
         emit loginJsonSignal(object.value("status").toString().toStdString());
 
     }
-    else if(action == "newAccount")
+    else if(action == JSONType::NEW_ACCOUNT)
     {
         emit newAccountSignal(object.value("status").toString().toStdString());
     }
-    else if(action == "getUserIdbyLogin")
+    else if(action == JSONType::USER_ID_BY_LOGIN)
     {
         emit userIdbyLoginSignal(object.value("id1").toInt(),
                                  object.value("id2").toInt());
     }
-    else if(action =="userList")
+    else if(action ==JSONType::USER_LIST)
     {
         emit userListReceived(object.value("userList").toArray());
     }
-    else if(action == "message")
+    else if(action == JSONType::MESSAGE)
     {
         emit processMessageSignal(object.value("text").toString().toStdString(),
-                                  object.value("recipientLogin").toString().toStdString());
+                                  object.value("senderLogin").toString().toStdString());
     }
+    //TODO::add error
 }
 

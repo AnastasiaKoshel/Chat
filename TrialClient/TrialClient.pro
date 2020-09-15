@@ -6,6 +6,7 @@ QMAKE_CXXFLAGS += /std:c++17
 
 HEADERS       = client.h \
     dialog.h \
+    jsonType.h \
     login.h \
     mainwidget.h \
     messageparser.h \
