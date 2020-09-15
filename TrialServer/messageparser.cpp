@@ -6,6 +6,33 @@ MessageParser::MessageParser()
     passwordLoginDB = std::make_unique<DBManager>();
     messagesDB = std::make_unique<MessagesDBManager>();
 }
+
+
+void MessageParser::processJson(QJsonObject& object, QTcpSocket* client, const std::vector<ClientData*>& clients)
+{
+    QJsonValue action = object.value("type");
+    qDebug()<<"jSonType "<<action;
+
+    switch(JSONType(action.toInt()))
+    {
+        case LOGIN:
+            processLogin(object, client, clients);
+            break;
+        case NEW_ACCOUNT:
+            processNewAccount(object, client, clients);
+            break;
+        case USER_LIST:
+            processUsersList(client);
+            break;
+        case USER_ID_BY_LOGIN:
+            processUserIdbyLogin(object, client);
+            break;
+        case MESSAGE:
+            processMessage(object, clients);
+            break;
+    }
+
+}
 void MessageParser::processUsersList(QTcpSocket* sender)
 {
     QJsonObject messageJson;
@@ -22,7 +49,7 @@ void MessageParser::processUsersList(QTcpSocket* sender)
     sender->write(jsonData);
 
 }
-void MessageParser::processLogin(const QJsonObject& json,  QTcpSocket* sender, std::vector<ClientData*>&clients)
+void MessageParser::processLogin(const QJsonObject& json,  QTcpSocket* sender, const std::vector<ClientData*>&clients)
 {
     qDebug()<<"Login json";
     const QJsonValue login = json.value("login");
@@ -53,7 +80,7 @@ void MessageParser::processLogin(const QJsonObject& json,  QTcpSocket* sender, s
 }
 
 
-void MessageParser::processNewAccount(const QJsonObject& json,  QTcpSocket* sender, std::vector<ClientData*>&clients)
+void MessageParser::processNewAccount(const QJsonObject& json,  QTcpSocket* sender, const std::vector<ClientData*>&clients)
 {
     qDebug()<<"New Account json";
     const QJsonValue login = json.value("login");
@@ -88,7 +115,7 @@ void MessageParser::processNewAccount(const QJsonObject& json,  QTcpSocket* send
     }
 
 }
-void MessageParser::processMessage(const QJsonObject& json, std::vector<ClientData*>&clients)
+void MessageParser::processMessage(const QJsonObject& json, const std::vector<ClientData*>&clients)
 {
     qDebug()<<"Message json";
     const std::string message = json.value("value").toString().toStdString();

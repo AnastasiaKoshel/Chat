@@ -41,6 +41,7 @@ void Server::initClient()
             client->clientSocket, &QObject::deleteLater);
     connect(client->clientSocket, &QAbstractSocket::disconnected,
             this, &Server::deleteUser);
+
 }
 
 
@@ -52,26 +53,8 @@ void Server::jsonReceived()
     QJsonParseError parseError;
 
     const QJsonDocument json = QJsonDocument::fromJson(jsonData, &parseError);
-    const QJsonValue action = json.object().value("type");
-    qDebug()<<"jSonType "<<action;
-    switch(JSONType(action.toInt()))
-    {
-        case LOGIN:
-            parser->processLogin(json.object(), client, clients);
-            break;
-        case NEW_ACCOUNT:
-            parser->processNewAccount(json.object(), client, clients);
-            break;
-        case USER_LIST:
-            parser->processUsersList(client);
-            break;
-        case USER_ID_BY_LOGIN:
-            parser->processUserIdbyLogin(json.object(), client);
-            break;
-        case MESSAGE:
-            parser->processMessage(json.object(), clients);
-            break;
-    }
+    QJsonObject jsonObject = json.object();
+    parser->processJson(jsonObject, client, clients);
 
 }
 

@@ -93,29 +93,7 @@ void MessageParser::processJson(QJsonObject& object)
             break;
     }
 
-    if(action == JSONType::LOGIN)
-    {
-        emit loginJsonSignal(object.value("status").toString().toStdString());
 
-    }
-    else if(action == JSONType::NEW_ACCOUNT)
-    {
-        emit newAccountSignal(object.value("status").toString().toStdString());
-    }
-    else if(action == JSONType::USER_ID_BY_LOGIN)
-    {
-        emit userIdbyLoginSignal(object.value("id1").toInt(),
-                                 object.value("id2").toInt());
-    }
-    else if(action ==JSONType::USER_LIST)
-    {
-        emit userListReceived(object.value("userList").toArray());
-    }
-    else if(action == JSONType::MESSAGE)
-    {
-        emit processMessageSignal(object.value("text").toString().toStdString(),
-                                  object.value("senderLogin").toString().toStdString());
-    }
     //TODO::add error
 }
 

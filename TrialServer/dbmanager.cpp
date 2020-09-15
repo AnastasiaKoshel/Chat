@@ -143,9 +143,9 @@ std::string DBManager::encryptPassword(std::string password)
 std::string DBManager::decryptPassword(std::string password)
 {
     qDebug()<<"incomming password in decrypt "<<password.c_str();
-    int step=3;
+    const int step=3;
     std::string result;
-    for(char cur:password)
+    for(char cur : password)
     {
         int curInt = cur - '0';
         curInt -= step;
