@@ -28,11 +28,13 @@ void MainWidget::on_mainLogInButton_clicked()
     this->close();
     login->show();
 }
+
 void MainWidget::requestUserList(const std::string& log)
 {
     loginStr = log;
     messageParser->requestAllUsers();
 }
+
 void MainWidget::showDialog(const QJsonArray& userArray)
 {
     dialog = new Dialog(messageParser, userArray, loginStr);
