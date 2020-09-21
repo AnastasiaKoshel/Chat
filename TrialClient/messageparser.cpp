@@ -10,53 +10,53 @@ MessageParser::MessageParser(QObject *parent)
     connect(this, SIGNAL(sendJSON(QJsonObject&)), client, SLOT(sendJSON(QJsonObject&)));
 }
 
-void MessageParser::sendTextMessage(const std::string& text, const std::string& login, const std::string& chatLogin)
+void MessageParser::sendTextMessage(const QString& text, const QString& login, const QString& chatLogin)
 {
     qDebug() << "Send message";
 
     QJsonObject messageJson;
     messageJson["type"] = JSONType::MESSAGE;
-    messageJson["value"] = text.c_str();
-    messageJson["recipientLogin"] = chatLogin.c_str();
-    messageJson["senderLogin"] = login.c_str();
+    messageJson["value"] = text;
+    messageJson["recipientLogin"] = chatLogin;
+    messageJson["senderLogin"] = login;
 
     emit sendJSON(messageJson);
 }
 
-void MessageParser::sendLoginMessage(const std::string& login, const std::string& password)
+void MessageParser::sendLoginMessage(const QString& login, const QString& password)
 {
     qDebug() << "Send login message";
 
     QJsonObject messageJson;
     messageJson["type"] = JSONType::LOGIN;
-    messageJson["login"] = login.c_str();
-    messageJson["password"] = password.c_str();
+    messageJson["login"] = login;
+    messageJson["password"] = password;
 
 
     emit sendJSON(messageJson);
 }
 
-void MessageParser::sendNewAccountMessage(const std::string& login, const std::string& password)
+void MessageParser::sendNewAccountMessage(const QString& login, const QString& password)
 {
     qDebug() << "Send login message";
 
     QJsonObject messageJson;
     messageJson["type"] = JSONType::NEW_ACCOUNT;
-    messageJson["login"] = login.c_str();
-    messageJson["password"] = password.c_str();
+    messageJson["login"] = login;
+    messageJson["password"] = password;
 
     emit sendJSON(messageJson);
 }
 
 
-void MessageParser::getSelectedChat(const std::string& login, const std::string& chatLogin)
+void MessageParser::getSelectedChat(const QString& login, const QString& chatLogin)
 {
-    qDebug() << "Entered getSelectedChat and my login is "<<login.c_str();
+    qDebug() << "Entered getSelectedChat and my login is "<<login;
 
     QJsonObject messageJson;
     messageJson["type"] = JSONType::USER_ID_BY_LOGIN;
-    messageJson["myLogin"] = login.c_str();
-    messageJson["otherLogin"] = chatLogin.c_str();
+    messageJson["myLogin"] = login;
+    messageJson["otherLogin"] = chatLogin;
 
     emit sendJSON(messageJson);
 }
@@ -75,10 +75,10 @@ void MessageParser::processJson(QJsonObject& object)
     switch(JSONType(action.toInt()))
     {
         case LOGIN:
-            emit loginJsonSignal(object.value("status").toString().toStdString());
+            emit loginJsonSignal(object.value("status").toString());
             break;
         case NEW_ACCOUNT:
-            emit newAccountSignal(object.value("status").toString().toStdString());
+            emit newAccountSignal(object.value("status").toString());
             break;
         case USER_LIST:
             emit userListReceived(object.value("userList").toArray());
@@ -88,8 +88,8 @@ void MessageParser::processJson(QJsonObject& object)
                                      object.value("id2").toInt());
             break;
         case MESSAGE:
-            emit processMessageSignal(object.value("text").toString().toStdString(),
-                                      object.value("senderLogin").toString().toStdString());
+            emit processMessageSignal(object.value("text").toString(),
+                                      object.value("senderLogin").toString());
             break;
     }
 

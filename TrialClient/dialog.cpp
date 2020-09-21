@@ -2,7 +2,7 @@
 #include "ui_dialog.h"
 
 
-Dialog::Dialog(MessageParser *msParser, QJsonArray usersArray, std::string login, QWidget *parent) :
+Dialog::Dialog(MessageParser *msParser, QJsonArray usersArray, QString login, QWidget *parent) :
     QDialog(parent),
     messageParser(msParser),
     usersList(usersArray),
@@ -12,7 +12,7 @@ Dialog::Dialog(MessageParser *msParser, QJsonArray usersArray, std::string login
     ui->setupUi(this);
     db = std::make_unique<MessagesDataBase>();
 
-    ui->titleLabel->setText(login.c_str());
+    ui->titleLabel->setText(login);
     for(auto user : usersArray)
     {
         ui->listWidget->addItem(user.toString());
@@ -20,8 +20,8 @@ Dialog::Dialog(MessageParser *msParser, QJsonArray usersArray, std::string login
     }
 
 
-    connect(messageParser, SIGNAL(processMessageSignal(const std::string&, const std::string&)),
-            this, SLOT(displayMessage(const std::string&, const std::string&)));
+    connect(messageParser, SIGNAL(processMessageSignal(const QString&, const QString&)),
+            this, SLOT(displayMessage(const QString&, const QString&)));
     connect(messageParser, SIGNAL(userIdbyLoginSignal(const int, const int)), this, SLOT(displayChat(const int, const int)));
 }
 
@@ -31,22 +31,22 @@ Dialog::~Dialog()
 
 void Dialog::on_sendButton_clicked()
 {
-    std::string message = ui->textEdit->toPlainText().toStdString();
+    QString message = ui->textEdit->toPlainText();
     messageParser->sendTextMessage(message, login, chatLogin);
-    message = ui->labelYourMessage->text().toStdString() + '\n'+ message;
-    ui->labelYourMessage->setText(message.c_str());
+    message = ui->labelYourMessage->text() + '\n'+ message;
+    ui->labelYourMessage->setText(message);
     ui->textEdit->clear();
 }
 
-void Dialog::displayMessage(const std::string& message, const std::string& senderLogin)
+void Dialog::displayMessage(const QString& message, const QString& senderLogin)
 {
-    qDebug()<<"curChatLogin "<<chatLogin.c_str()<<" recipient Login "<<senderLogin.c_str();
+    qDebug()<<"curChatLogin "<<chatLogin<<" recipient Login "<<senderLogin;
     if(chatLogin == senderLogin)
     {
-        std::string curMessage = ui->label->text().toStdString();
+        QString curMessage = ui->label->text();
         curMessage += "\n";
         curMessage += message;
-        ui->label->setText(curMessage.c_str());
+        ui->label->setText(curMessage);
     }
 }
 
@@ -55,7 +55,7 @@ void Dialog::on_listWidget_itemClicked(QListWidgetItem *item)
 {
     qDebug()<< "Clicked on list widget item and login is "<<item->text();
 
-    chatLogin = item->text().toStdString();
+    chatLogin = item->text();
     //client->setCurrentChatLogin();
     messageParser->getSelectedChat(login, chatLogin);
      qDebug()<<item->text();
@@ -65,12 +65,12 @@ void Dialog::on_listWidget_itemClicked(QListWidgetItem *item)
 void Dialog::displayChat(const int myId, const int otherId)
 {
     std::vector<Message> messageHistory = db->getMessageHistory(myId, otherId);
-    std::string myMessageText="";
-    std::string otherMessageText="";
+    QString myMessageText="";
+    QString otherMessageText="";
 
     for(Message curMessage : messageHistory)
     {
-        if(curMessage.isMyMessage && !curMessage.text.empty())
+        if(curMessage.isMyMessage && !curMessage.text.isEmpty())
         {
             myMessageText += (curMessage.text + "\n");
             otherMessageText += "\n";
@@ -83,7 +83,7 @@ void Dialog::displayChat(const int myId, const int otherId)
 
     }
     //qDebug()<<"My messages "<<myMessageText;
-    ui->labelYourMessage->setText(myMessageText.c_str());
+    ui->labelYourMessage->setText(myMessageText);
     //qDebug()<<"Other messages "<<myMessageText;
-    ui->label->setText(otherMessageText.c_str());
+    ui->label->setText(otherMessageText);
 }

@@ -28,14 +28,14 @@ void Dialog::on_connectButton_clicked()
         ui->label->setText("Server init succes");
         ui->connectButton->setEnabled(false);
     }
-     const bool success = connect(&server, SIGNAL(processMessageSignal(std::string)), this, SLOT(displayMessage(std::string)));
+     const bool success = connect(&server, SIGNAL(processMessageSignal(QString)), this, SLOT(displayMessage(QString)));
      if(!success)
         ui->label->setText("failed connecting to displayMessage");
 
 }
 
 
-void Dialog::displayMessage(const std::string& s)
+void Dialog::displayMessage(const QString& s)
 {
-     ui->label->setText(ui->label->text() + '\n' +s.c_str());
+     ui->label->setText(ui->label->text() + '\n' +s);
 }

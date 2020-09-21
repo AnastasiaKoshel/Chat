@@ -3,7 +3,7 @@
 MessagesDBManager::MessagesDBManager()
 {
     messagesDB = QSqlDatabase::addDatabase("QSQLITE", "MessageData");
-    messagesDB.setDatabaseName(path.c_str());
+    messagesDB.setDatabaseName(path);
     qDebug() << QSqlDatabase::drivers();
     if (!messagesDB.open())
     {
@@ -16,9 +16,9 @@ MessagesDBManager::MessagesDBManager()
 }
 
 
-bool MessagesDBManager::writeMessageToDB(const std::string& message, const int senderID, const int recipientID)
+bool MessagesDBManager::writeMessageToDB(const QString& message, const int senderID, const int recipientID)
 {
-    qDebug()<<"Entered writeMessageToDB message:"<<message.c_str()<<" senderID:"<<senderID<<" recipientID:"<<recipientID;
+    qDebug()<<"Entered writeMessageToDB message:"<<message<<" senderID:"<<senderID<<" recipientID:"<<recipientID;
     if(!senderID || !recipientID)
     {
         qDebug()<<"No such user";
@@ -32,7 +32,7 @@ bool MessagesDBManager::writeMessageToDB(const std::string& message, const int s
     //query.bindValue(":id", 0);
     query.bindValue(":senderID", senderID);
     query.bindValue(":recipientID", recipientID);
-    query.bindValue(":message", message.c_str());
+    query.bindValue(":message", message);
     query.bindValue(":timestamp", timestamp);
 
 

@@ -33,7 +33,7 @@ void Server::initClient()
     client->clientSocket = tcpServer->nextPendingConnection();
     clients.push_back(client);
 
-    emit processMessageSignal("New client from:" + std::to_string(client->clientSocket->socketDescriptor()));
+    emit processMessageSignal("New client from:" + QString::number(client->clientSocket->socketDescriptor()));
     connect(client->clientSocket, &QIODevice::readyRead,
             this, &Server::jsonReceived);
 

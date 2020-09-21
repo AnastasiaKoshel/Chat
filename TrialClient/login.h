@@ -22,10 +22,10 @@ public:
     ~Login();
 
 signals:
-    void logInSuccess(const std::string& login);
+    void logInSuccess(const QString& login);
 
 private slots:
-    void loginSignalReceived(const std::string& status);
+    void loginSignalReceived(const QString& status);
     void on_loginButton_clicked();
 
 private:

@@ -17,8 +17,8 @@
 struct ClientData{
 
     QTcpSocket* clientSocket;
-    std::string password;
-    std::string login;
+    QString password;
+    QString login;
 };
 
 class MessageParser
@@ -35,7 +35,7 @@ public:
     void processUserIdbyLogin(const QJsonObject& json, QTcpSocket* sender);
 
 signals:
-    void processLoginSignal(std::string s);
+    void processLoginSignal(QString s);
 
 public slots:
     void processJson(QJsonObject& object, QTcpSocket* client, const std::vector<ClientData*>& clients);

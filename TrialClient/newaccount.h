@@ -21,10 +21,10 @@ public:
 
 
 signals:
-    void createNewAccountSuccess(const std::string& login);
+    void createNewAccountSuccess(const QString& login);
 
 private slots:
-    void newAccountSignalReceived(const std::string& status);
+    void newAccountSignalReceived(const QString& status);
     void on_okButton_clicked();
 
 private:

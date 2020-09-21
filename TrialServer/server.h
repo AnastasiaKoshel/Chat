@@ -36,7 +36,7 @@ private slots:
     void deleteUser();
 
 signals:
-    void processMessageSignal(std::string s);
+    void processMessageSignal(QString s);
 
 private:
     void messageReceived(const QJsonObject& json);

@@ -8,18 +8,18 @@ NewAccount::NewAccount(MessageParser *msParser, QWidget *parent) :
 {
     ui = std::make_unique<Ui::NewAccount>();
     ui->setupUi(this);
-    connect(messageParser, SIGNAL(newAccountSignal(const std::string&)), this, SLOT(newAccountSignalReceived(const std::string&)));
+    connect(messageParser, SIGNAL(newAccountSignal(const QString&)), this, SLOT(newAccountSignalReceived(const QString&)));
 }
 
 NewAccount::~NewAccount()
 {
 }
 
-void NewAccount::newAccountSignalReceived(const std::string& status)
+void NewAccount::newAccountSignalReceived(const QString& status)
 {
     if(status == "Success")
     {
-        emit createNewAccountSuccess(ui->loginLine->text().toStdString());
+        emit createNewAccountSuccess(ui->loginLine->text());
     }
     else
     {
@@ -32,9 +32,9 @@ void NewAccount::newAccountSignalReceived(const std::string& status)
 
 void NewAccount::on_okButton_clicked()
 {
-    const std::string login = ui->loginLine->text().toStdString();
-    const std::string password1 = ui->passwordLine1->text().toStdString();
-    const std::string password2 = ui->passwordLine2->text().toStdString();
+    const QString login = ui->loginLine->text();
+    const QString password1 = ui->passwordLine1->text();
+    const QString password2 = ui->passwordLine2->text();
 
     if(password1 != password2)
     {

@@ -38,11 +38,11 @@ void MessageParser::processUsersList(QTcpSocket* sender)
     QJsonObject messageJson;
     messageJson["type"]=JSONType::USER_LIST;
     QJsonArray usersArray;
-    std::vector<std::string> usersVector = passwordLoginDB->getAllUsers();
+    std::vector<QString> usersVector = passwordLoginDB->getAllUsers();
     for(auto user : usersVector )
     {
          //QJsonObject userJson;
-         usersArray.append(QJsonValue(user.c_str()));
+         usersArray.append(QJsonValue(user));
     }
     messageJson["userList"]=usersArray;
     const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
@@ -55,7 +55,7 @@ void MessageParser::processLogin(const QJsonObject& json,  QTcpSocket* sender, c
     const QJsonValue login = json.value("login");
     const QJsonValue password = json.value("password");
     bool ifLoginMatchPassword =
-            passwordLoginDB->loginAndPasswordMatch(login.toString().toStdString(), password.toString().toStdString());
+            passwordLoginDB->loginAndPasswordMatch(login.toString(), password.toString());
 
     QJsonObject messageJson;
     messageJson["type"] = JSONType::LOGIN;
@@ -72,7 +72,7 @@ void MessageParser::processLogin(const QJsonObject& json,  QTcpSocket* sender, c
     {
         if(curClient->clientSocket->socketDescriptor() == sender->socketDescriptor())
         {
-            curClient->login = login.toString().toStdString();
+            curClient->login = login.toString();
         }
     }
     //emit processMessageSignal("Login: " + login.toString().toStdString() + "  \nPassword: " + password.toString().toStdString());
@@ -88,7 +88,7 @@ void MessageParser::processNewAccount(const QJsonObject& json,  QTcpSocket* send
 
 
     //TODO: emit signal
-    int id = passwordLoginDB->getIDbyLogin(login.toString().toStdString());
+    int id = passwordLoginDB->getIDbyLogin(login.toString());
 
     QJsonObject messageJson;
     messageJson["type"] = JSONType::NEW_ACCOUNT;
@@ -98,7 +98,7 @@ void MessageParser::processNewAccount(const QJsonObject& json,  QTcpSocket* send
     }
     else
     {
-       passwordLoginDB->addClient(login.toString().toStdString(), password.toString().toStdString());
+       passwordLoginDB->addClient(login.toString(), password.toString());
        messageJson["status"] = "Success";
        //emit processMessageSignal("New Account has been created");
     }
@@ -110,7 +110,7 @@ void MessageParser::processNewAccount(const QJsonObject& json,  QTcpSocket* send
     {
         if(curClient->clientSocket->socketDescriptor() == sender->socketDescriptor())
         {
-            curClient->login = login.toString().toStdString();
+            curClient->login = login.toString();
         }
     }
 
@@ -118,16 +118,16 @@ void MessageParser::processNewAccount(const QJsonObject& json,  QTcpSocket* send
 void MessageParser::processMessage(const QJsonObject& json, const std::vector<ClientData*>&clients)
 {
     qDebug()<<"Message json";
-    const std::string message = json.value("value").toString().toStdString();
-    const std::string senderLogin = json.value("senderLogin").toString().toStdString();
-    const std::string recipientLogin = json.value("recipientLogin").toString().toStdString();
+    const QString message = json.value("value").toString();
+    const QString senderLogin = json.value("senderLogin").toString();
+    const QString recipientLogin = json.value("recipientLogin").toString();
 
     messagesDB->writeMessageToDB(message, passwordLoginDB->getIDbyLogin(senderLogin),passwordLoginDB->getIDbyLogin(recipientLogin));
 
     QJsonObject messageJson;
     messageJson["type"] = JSONType::MESSAGE;
-    messageJson["text"] = message.c_str();
-    messageJson["senderLogin"] = senderLogin.c_str();
+    messageJson["text"] = message;
+    messageJson["senderLogin"] = senderLogin;
     const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
 
     //const int recipient = json.value("recipientID").toInt();
@@ -146,12 +146,12 @@ void MessageParser::processUserIdbyLogin(const QJsonObject& json, QTcpSocket* se
 {
     qDebug()<<"entered sendUserIdbyLogin";
 
-    std::string login1 = json.value("myLogin").toString().toStdString();
-    std::string login2 = json.value("otherLogin").toString().toStdString();
+    QString login1 = json.value("myLogin").toString();
+    QString login2 = json.value("otherLogin").toString();
     int id1 = passwordLoginDB->getIDbyLogin(login1);
     int id2 = passwordLoginDB->getIDbyLogin(login2);
 
-    qDebug()<<"Received logins "<<login1.c_str()<<" and "<<login2.c_str()<<" Return ids "<<id1<<" and "<<id2;
+    qDebug()<<"Received logins "<<login1<<" and "<<login2<<" Return ids "<<id1<<" and "<<id2;
 
     QJsonObject messageJson;
     messageJson["type"] = JSONType::USER_ID_BY_LOGIN;

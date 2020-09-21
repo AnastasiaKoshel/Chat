@@ -13,8 +13,8 @@ MainWidget::MainWidget(QWidget *parent) :
     ui->setupUi(this);
     connect(messageParser, SIGNAL(userListReceived(QJsonArray)), this, SLOT(showDialog(QJsonArray)));
 
-    connect(login, SIGNAL(logInSuccess(const std::string&)), this, SLOT(requestUserList(const std::string&)));
-    connect(newAccount, SIGNAL(createNewAccountSuccess(const std::string&)), this, SLOT(requestUserList(const std::string&)));
+    connect(login, SIGNAL(logInSuccess(const QString&)), this, SLOT(requestUserList(const QString&)));
+    connect(newAccount, SIGNAL(createNewAccountSuccess(const QString&)), this, SLOT(requestUserList(const QString&)));
 
 }
 
@@ -29,7 +29,7 @@ void MainWidget::on_mainLogInButton_clicked()
     login->show();
 }
 
-void MainWidget::requestUserList(const std::string& log)
+void MainWidget::requestUserList(const QString& log)
 {
     loginStr = log;
     messageParser->requestAllUsers();

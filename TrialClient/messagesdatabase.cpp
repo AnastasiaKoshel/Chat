@@ -3,7 +3,7 @@
 MessagesDataBase::MessagesDataBase()
 {
     messagesDB = QSqlDatabase::addDatabase("QSQLITE", "MessageDB");
-    messagesDB.setDatabaseName(path.c_str());
+    messagesDB.setDatabaseName(path);
     qDebug() << QSqlDatabase::drivers();
     if (!messagesDB.open())
     {
@@ -31,11 +31,11 @@ std::vector<Message> MessagesDataBase::getMessageHistory(const int myID, const i
     }
     while(query.next())
     {
-        currentMessage.text = query.value(3).toString().toStdString();
+        currentMessage.text = query.value(3).toString();
         currentMessage.timestamp = query.value(4).toInt();
         currentMessage.isMyMessage = true;
         messageHistory.push_back(currentMessage);
-        qDebug() << "My mess "<<currentMessage.text.c_str();
+        qDebug() << "My mess "<<currentMessage.text;
 
     }
 
@@ -49,11 +49,11 @@ std::vector<Message> MessagesDataBase::getMessageHistory(const int myID, const i
     }
     while(query.next())
     {
-        currentMessage.text = query.value(3).toString().toStdString(); //add name of column to select
+        currentMessage.text = query.value(3).toString(); //add name of column to select
         currentMessage.timestamp = query.value(4).toInt();
         currentMessage.isMyMessage = false;
         messageHistory.push_back(currentMessage);
-        qDebug() << "Other mess "<<currentMessage.text.c_str(); //probably add std::string
+        qDebug() << "Other mess "<<currentMessage.text; //probably add QString
 
     }
     sort(messageHistory.begin(), messageHistory.end(),

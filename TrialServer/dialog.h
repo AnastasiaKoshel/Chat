@@ -25,7 +25,7 @@ private slots:
 
     void on_connectButton_clicked();
 
-    void displayMessage(const std::string& s);
+    void displayMessage(const QString& s);
 
 private:
     Ui::Dialog *ui;

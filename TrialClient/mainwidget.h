@@ -27,7 +27,7 @@ public:
 private slots:
     void on_mainLogInButton_clicked();
     void showDialog(const QJsonArray& userArray);
-    void requestUserList(const std::string& login);
+    void requestUserList(const QString& login);
 
     void on_newAccountButton_clicked();
 
@@ -36,7 +36,7 @@ private:
     Dialog *dialog;
     Login *login;
     NewAccount *newAccount;
-    std::string loginStr;
+    QString loginStr;
 };
 
 #endif // MAINWIDGET_H

@@ -8,19 +8,19 @@ Login::Login(MessageParser *msParser, QWidget *parent) :
 {
     ui = std::make_unique<Ui::Login>();
     ui->setupUi(this);
-    connect(messageParser, SIGNAL(loginJsonSignal(const std::string&)), this, SLOT(loginSignalReceived(const std::string&)));
+    connect(messageParser, SIGNAL(loginJsonSignal(const QString&)), this, SLOT(loginSignalReceived(const QString&)));
 }
 
 Login::~Login()
 {
 }
 
-void Login::loginSignalReceived(const std::string& status)
+void Login::loginSignalReceived(const QString& status)
 {
     qDebug()<<"entered loginSignalReceived in Login class";
     if(status == "Success")
     {
-        emit logInSuccess(ui->loginLine->text().toStdString());
+        emit logInSuccess(ui->loginLine->text());
     }
     else
     {
@@ -32,8 +32,8 @@ void Login::loginSignalReceived(const std::string& status)
 
 void Login::on_loginButton_clicked()
 {
-    const std::string login = ui->loginLine->text().toStdString();
-    const std::string password = ui->passwordLine->text().toStdString();
+    const QString login = ui->loginLine->text();
+    const QString password = ui->passwordLine->text();
 
     messageParser->sendLoginMessage(login, password);
 

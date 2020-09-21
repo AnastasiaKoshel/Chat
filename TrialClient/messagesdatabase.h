@@ -8,7 +8,7 @@
 
 struct Message
 {
-    std::string text;
+    QString text;
     bool isMyMessage;
     int timestamp;
 
@@ -22,7 +22,7 @@ public:
 
 private:
     QSqlDatabase messagesDB;
-    const std::string path = "C:/Users/Anastasiia_Koshel/SQlite/messageData.db";
+    const QString path = "C:/Users/Anastasiia_Koshel/SQlite/messageData.db";
 };
 
 #endif // MESSAGESDATABASE_H
