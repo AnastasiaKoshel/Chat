@@ -8,7 +8,7 @@ Dialog::Dialog(MessageParser *msParser, QJsonArray usersArray, QString login, QW
     usersList(usersArray),
     login(login)
 {
-    ui = std::make_unique<Ui::Dialog>();
+    ui = new Ui::Dialog();
     ui->setupUi(this);
     db = std::make_unique<MessagesDataBase>();
 
@@ -27,14 +27,16 @@ Dialog::Dialog(MessageParser *msParser, QJsonArray usersArray, QString login, QW
 
 Dialog::~Dialog()
 {
+    delete ui;
 }
 
 void Dialog::on_sendButton_clicked()
 {
     QString message = ui->textEdit->toPlainText();
     messageParser->sendTextMessage(message, login, chatLogin);
-    message = ui->labelYourMessage->text() + '\n'+ message;
-    ui->labelYourMessage->setText(message);
+    auto item = std::make_unique<QListWidgetItem>(message);
+    item->setTextAlignment(Qt::AlignRight);
+    ui->messagesWidget->addItem(item.get());
     ui->textEdit->clear();
 }
 
@@ -43,10 +45,9 @@ void Dialog::displayMessage(const QString& message, const QString& senderLogin)
     qDebug()<<"curChatLogin "<<chatLogin<<" recipient Login "<<senderLogin;
     if(chatLogin == senderLogin)
     {
-        QString curMessage = ui->label->text();
-        curMessage += "\n";
-        curMessage += message;
-        ui->label->setText(curMessage);
+        auto item = std::make_unique<QListWidgetItem>(message);
+        item->setTextAlignment(Qt::AlignLeft);
+        ui->messagesWidget->addItem(item.get());
     }
 }
 
@@ -56,10 +57,9 @@ void Dialog::on_listWidget_itemClicked(QListWidgetItem *item)
     qDebug()<< "Clicked on list widget item and login is "<<item->text();
 
     chatLogin = item->text();
-    //client->setCurrentChatLogin();
     messageParser->getSelectedChat(login, chatLogin);
-     qDebug()<<item->text();
-   // displayChat();
+    qDebug()<<item->text();
+
 }
 
 void Dialog::displayChat(const int myId, const int otherId)
@@ -67,23 +67,25 @@ void Dialog::displayChat(const int myId, const int otherId)
     std::vector<Message> messageHistory = db->getMessageHistory(myId, otherId);
     QString myMessageText="";
     QString otherMessageText="";
-
+    //const QString& image = "C:/Users/Anastasiia_Koshel/Documents/Chat/TrialClient/you.png";
+    //QIcon icon("C:/Users/Anastasiia_Koshel/Documents/Chat/TrialClient/you.png");
     for(Message curMessage : messageHistory)
     {
-        if(curMessage.isMyMessage && !curMessage.text.isEmpty())
+        if(!curMessage.text.isEmpty())
         {
-            myMessageText += (curMessage.text + "\n");
-            otherMessageText += "\n";
-        }
-        else
-        {
-            otherMessageText += (curMessage.text  + "\n");
-            myMessageText += "\n";
+            QListWidgetItem* item = new QListWidgetItem(curMessage.text);
+            if(curMessage.isMyMessage)
+            {
+                 item->setTextAlignment(Qt::AlignRight|Qt::AlignRight);
+                 //item->setIcon(icon);
+            }
+
+            else
+                item->setTextAlignment(Qt::AlignLeft);
+            ui->messagesWidget->addItem(item);
         }
 
     }
-    //qDebug()<<"My messages "<<myMessageText;
-    ui->labelYourMessage->setText(myMessageText);
-    //qDebug()<<"Other messages "<<myMessageText;
-    ui->label->setText(otherMessageText);
 }
+
+

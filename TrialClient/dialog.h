@@ -32,7 +32,7 @@ private slots:
 
 
 private:
-    std::unique_ptr<Ui::Dialog> ui;
+    Ui::Dialog* ui;
     MessageParser *messageParser;
     std::unique_ptr<MessagesDataBase> db;
     QJsonArray usersList;
