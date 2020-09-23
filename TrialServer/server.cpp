@@ -49,7 +49,7 @@ void Server::initClient()
 void Server::jsonReceived()
 {
     QTcpSocket *client = (QTcpSocket*)sender();
-    QByteArray jsonData = client->read(1000);
+    QByteArray jsonData = client->readAll();
     QJsonParseError parseError;
 
     const QJsonDocument json = QJsonDocument::fromJson(jsonData, &parseError);

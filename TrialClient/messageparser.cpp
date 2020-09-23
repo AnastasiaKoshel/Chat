@@ -23,6 +23,26 @@ void MessageParser::sendTextMessage(const QString& text, const QString& login, c
     emit sendJSON(messageJson);
 }
 
+void MessageParser::sendFileMessage(QString & filePath, const QString& login, const QString& chatLogin)
+{
+    qDebug() << "Send file message";
+    QFile file(filePath);
+    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            qDebug() << "[MessageParser] Error reading file";
+
+    QJsonObject fileJson;
+
+    QByteArray array = file.readAll();
+    fileJson["type"] = JSONType::FILE_MESSAGE;
+    fileJson["value"] = array.data();
+        qDebug()<<"[MessageParser] file type "<<fileJson["type"];
+        qDebug()<<"[MessageParser] file "<<array.data();
+    fileJson["recipientLogin"] = chatLogin;
+    fileJson["senderLogin"] = login;
+
+    emit sendJSON(fileJson);
+}
+
 void MessageParser::sendLoginMessage(const QString& login, const QString& password)
 {
     qDebug() << "Send login message";
@@ -31,7 +51,6 @@ void MessageParser::sendLoginMessage(const QString& login, const QString& passwo
     messageJson["type"] = JSONType::LOGIN;
     messageJson["login"] = login;
     messageJson["password"] = password;
-
 
     emit sendJSON(messageJson);
 }
@@ -90,6 +109,9 @@ void MessageParser::processJson(QJsonObject& object)
         case MESSAGE:
             emit processMessageSignal(object.value("text").toString(),
                                       object.value("senderLogin").toString());
+            break;
+        case FILE_MESSAGE:
+            emit processFileMessageSignal(object.value("value").toString());
             break;
     }
 

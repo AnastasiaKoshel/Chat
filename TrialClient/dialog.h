@@ -7,6 +7,7 @@
 #include "messageparser.h"
 #include <QListWidgetItem>
 #include "messagesdatabase.h"
+#include <QFileDialog>
 
 
 namespace Ui {
@@ -31,6 +32,8 @@ private slots:
     void on_listWidget_itemClicked(QListWidgetItem *item);
 
 
+    void on_uploadButton_clicked();
+
 private:
     Ui::Dialog* ui;
     MessageParser *messageParser;
@@ -38,6 +41,7 @@ private:
     QJsonArray usersList;
     QString login;
     QString chatLogin;
+    bool isFileUploaded = false;
 };
 
 #endif // DIALOG_H

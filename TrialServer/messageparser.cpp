@@ -30,6 +30,9 @@ void MessageParser::processJson(QJsonObject& object, QTcpSocket* client, const s
         case MESSAGE:
             processMessage(object, clients);
             break;
+        case FILE_MESSAGE:
+            processFile(object, clients);
+            break;
     }
 
 }
@@ -127,6 +130,34 @@ void MessageParser::processMessage(const QJsonObject& json, const std::vector<Cl
     QJsonObject messageJson;
     messageJson["type"] = JSONType::MESSAGE;
     messageJson["text"] = message;
+    messageJson["senderLogin"] = senderLogin;
+    const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
+
+    //const int recipient = json.value("recipientID").toInt();
+    foreach(ClientData* clientCur, clients)
+    {
+        if(clientCur->login == recipientLogin)
+        {
+            clientCur->clientSocket->write(jsonData);
+            //emit processMessageSignal(message);
+        }
+    }
+
+}
+
+void MessageParser::processFile(const QJsonObject& json, const std::vector<ClientData*>&clients)
+{
+    qDebug()<<"Message json";
+    const QString file = json.value("value").toString();
+    const QString senderLogin = json.value("senderLogin").toString();
+    const QString recipientLogin = json.value("recipientLogin").toString();
+
+    messagesDB->writeMessageToDB(file, passwordLoginDB->getIDbyLogin(senderLogin),passwordLoginDB->getIDbyLogin(recipientLogin));
+
+    QJsonObject messageJson;
+    messageJson["type"] = JSONType::MESSAGE;
+    messageJson["value"] = file;
+    qDebug()<<"[MessageParser] file"<<file;
     messageJson["senderLogin"] = senderLogin;
     const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
 

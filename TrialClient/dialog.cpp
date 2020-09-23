@@ -33,10 +33,12 @@ Dialog::~Dialog()
 void Dialog::on_sendButton_clicked()
 {
     QString message = ui->textEdit->toPlainText();
-    messageParser->sendTextMessage(message, login, chatLogin);
-    auto item = std::make_unique<QListWidgetItem>(message);
+    if(!message.isEmpty())
+        messageParser->sendTextMessage(message, login, chatLogin);
+
+    QListWidgetItem* item = new QListWidgetItem(message);
     item->setTextAlignment(Qt::AlignRight);
-    ui->messagesWidget->addItem(item.get());
+    ui->messagesWidget->addItem(item);
     ui->textEdit->clear();
 }
 
@@ -45,9 +47,9 @@ void Dialog::displayMessage(const QString& message, const QString& senderLogin)
     qDebug()<<"curChatLogin "<<chatLogin<<" recipient Login "<<senderLogin;
     if(chatLogin == senderLogin)
     {
-        auto item = std::make_unique<QListWidgetItem>(message);
+        QListWidgetItem* item = new QListWidgetItem(message);
         item->setTextAlignment(Qt::AlignLeft);
-        ui->messagesWidget->addItem(item.get());
+        ui->messagesWidget->addItem(item);
     }
 }
 
@@ -64,6 +66,7 @@ void Dialog::on_listWidget_itemClicked(QListWidgetItem *item)
 
 void Dialog::displayChat(const int myId, const int otherId)
 {
+    ui->messagesWidget->clear();
     std::vector<Message> messageHistory = db->getMessageHistory(myId, otherId);
     QString myMessageText="";
     QString otherMessageText="";
@@ -89,3 +92,10 @@ void Dialog::displayChat(const int myId, const int otherId)
 }
 
 
+
+void Dialog::on_uploadButton_clicked()
+{
+    QString filePath = QFileDialog::getOpenFileName(this, "open a file", "C:/");
+    qDebug()<<"File path"<< filePath;
+    messageParser->sendFileMessage(filePath, login, chatLogin);
+}

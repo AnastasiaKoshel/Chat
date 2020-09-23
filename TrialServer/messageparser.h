@@ -31,6 +31,7 @@ public:
     void processLogin(const QJsonObject& json,  QTcpSocket* sender, const std::vector<ClientData*>&clients);
     void processNewAccount(const QJsonObject& json,  QTcpSocket* sender, const std::vector<ClientData*>&clients);
     void processMessage(const QJsonObject& json,  const std::vector<ClientData*>&clients);
+    void processFile(const QJsonObject& json,  const std::vector<ClientData*>&clients);
     void processUsersList(QTcpSocket* sender);
     void processUserIdbyLogin(const QJsonObject& json, QTcpSocket* sender);
 

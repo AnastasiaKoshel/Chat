@@ -104,6 +104,19 @@ background-color:#c5fdff;
     <enum>Qt::LeftToRight</enum>
    </property>
   </widget>
+  <widget class="QPushButton" name="uploadButton">
+   <property name="geometry">
+    <rect>
+     <x>360</x>
+     <y>370</y>
+     <width>75</width>
+     <height>23</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string>Upload File</string>
+   </property>
+  </widget>
  </widget>
  <resources/>
  <connections/>
