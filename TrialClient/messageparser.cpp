@@ -1,5 +1,6 @@
 #include "messageparser.h"
 #include "jsonType.h"
+#include <string>
 
 MessageParser::MessageParser(QObject *parent)
     : QObject(parent),
@@ -8,6 +9,11 @@ MessageParser::MessageParser(QObject *parent)
     client->connectToServer();
     connect(client, SIGNAL(jsonReceived(QJsonObject&)), this, SLOT(processJson(QJsonObject&)));
     connect(this, SIGNAL(sendJSON(QJsonObject&)), client, SLOT(sendJSON(QJsonObject&)));
+}
+
+std::size_t hashPassword(QString password)
+{
+    return std::hash<std::string>{}(password.toStdString());
 }
 
 void MessageParser::sendTextMessage(const QString& text, const QString& login, const QString& chatLogin)
@@ -50,7 +56,7 @@ void MessageParser::sendLoginMessage(const QString& login, const QString& passwo
     QJsonObject messageJson;
     messageJson["type"] = JSONType::LOGIN;
     messageJson["login"] = login;
-    messageJson["password"] = password;
+    messageJson["password"] = QString::number(hashPassword(password));
 
     emit sendJSON(messageJson);
 }
@@ -62,7 +68,7 @@ void MessageParser::sendNewAccountMessage(const QString& login, const QString& p
     QJsonObject messageJson;
     messageJson["type"] = JSONType::NEW_ACCOUNT;
     messageJson["login"] = login;
-    messageJson["password"] = password;
+    messageJson["password"] = QString::number(hashPassword(password));
 
     emit sendJSON(messageJson);
 }

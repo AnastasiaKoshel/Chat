@@ -28,7 +28,7 @@ bool DBManager::addClient(const QString& login, QString password)
     if(login.isEmpty() || password.isEmpty())
         return false;
 
-    password = encryptPassword(password);
+    qDebug()<<"login = "<<login<<"password = "<<password;
     bool success = false;
     // TODO: you should check if args are ok first...
     QSqlQuery query(db);
@@ -114,7 +114,7 @@ bool DBManager::loginAndPasswordMatch(const QString& login, const QString& passw
         qDebug() << "Login from DB: " << query.value(loginInd).toString()<< " Login income: "<<login;
         qDebug() << "Password: " << query.value(passwordInd).toString()<<" Password income: "<<password;
 
-        const QString curPassword = decryptPassword(query.value(passwordInd).toString());
+        const QString curPassword = query.value(passwordInd).toString();
 
         if(curPassword == password )
             return true;
@@ -122,39 +122,5 @@ bool DBManager::loginAndPasswordMatch(const QString& login, const QString& passw
     return false;
 }
 
-QString DBManager::encryptPassword(QString password)
-{
 
-    qDebug()<<"incomming password in encrypt "<<password;
-    int step=3;
-    std::string result;
-    for(char cur : password.toStdString())
-    {
-        int curInt = cur - '0';
-        curInt += step;
-        curInt = curInt % 128;
-        result += curInt + '0';
-
-    }
-    qDebug()<<"outcomming password in encrypt "<<result.c_str();
-    return result.c_str();
-}
-
-QString DBManager::decryptPassword(QString password)
-{
-    qDebug()<<"incomming password in decrypt "<<password;
-    const int step=3;
-    std::string result;
-    for(char cur : password.toStdString())
-    {
-        int curInt = cur - '0';
-        curInt -= step;
-        curInt = curInt % 128;
-        result += curInt + '0';
-
-    }
-    qDebug()<<"outcomming password in decrypt "<<result.c_str();
-    return result.c_str();
-
-}
 

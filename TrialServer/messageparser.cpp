@@ -57,7 +57,8 @@ void MessageParser::processLogin(const QJsonObject& json,  QTcpSocket* sender, c
     qDebug()<<"Login json";
     const QJsonValue login = json.value("login");
     const QJsonValue password = json.value("password");
-    bool ifLoginMatchPassword =
+    qDebug()<<"Login" << login << " password"<<password;
+    const bool ifLoginMatchPassword =
             passwordLoginDB->loginAndPasswordMatch(login.toString(), password.toString());
 
     QJsonObject messageJson;
@@ -91,7 +92,7 @@ void MessageParser::processNewAccount(const QJsonObject& json,  QTcpSocket* send
 
 
     //TODO: emit signal
-    int id = passwordLoginDB->getIDbyLogin(login.toString());
+    const int id = passwordLoginDB->getIDbyLogin(login.toString());
 
     QJsonObject messageJson;
     messageJson["type"] = JSONType::NEW_ACCOUNT;
