@@ -2,15 +2,15 @@
 #define SERVER_H
 
 #include <QDialog>
-#include <QString>
+#include <string>
 #include <QVector>
 #include <QtNetwork>
 #include <QtCore>
-#include "string"
 #include "vector"
 #include <QSet>
 #include "dbmanager.h"
 #include "messagesdbmanager.h"
+#include "messageparser.h"
 
 QT_BEGIN_NAMESPACE
 class QLabel;
@@ -19,12 +19,7 @@ QT_END_NAMESPACE
 
 
 
-struct ClientData{
 
-    QTcpSocket* clientSocket;
-    std::string password;
-    std::string login;
-};
 
 //! [0]
 class Server : public QTcpServer
@@ -41,19 +36,14 @@ private slots:
     void deleteUser();
 
 signals:
-    void processMessageSignal(std::string s);
+    void processMessageSignal(QString s);
 
 private:
     void messageReceived(const QJsonObject& json);
-    void processLogin(const QJsonObject& json,  QTcpSocket* sender);
-    void processNewAccount(const QJsonObject& json,  QTcpSocket* sender);
-    void processMessage(const QJsonObject& json, QTcpSocket* sender);
-    void sendUsersList(QTcpSocket* sender);
-    void sendUserIdbyLogin(const QJsonObject& json, QTcpSocket* sender);
+
     std::unique_ptr<QTcpServer> tcpServer;
     std::vector<ClientData*> clients;
-    std::unique_ptr<DBManager> db;
-    std::unique_ptr<MessagesDBManager> messagesDB;
+    std::unique_ptr<MessageParser> parser;
 
 };
 

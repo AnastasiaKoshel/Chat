@@ -3,12 +3,17 @@ QT += network widgets \
 
 HEADERS       = dialog.h \
                 dbmanager.h \
-                server.h
+                jsonType.h \
+                messageparser.h \
+                server.h \
+                messagesdbmanager.h
 
 SOURCES       = dialog.cpp \
                 dbmanager.cpp \
+                messageparser.cpp \
                 server.cpp \
-                main.cpp
+                main.cpp \
+                messagesdbmanager.cpp
 
 # install
 target.path = $$[QT_INSTALL_EXAMPLES]/network/fortuneserver

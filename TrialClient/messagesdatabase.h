@@ -1,11 +1,14 @@
 #ifndef MESSAGESDATABASE_H
 #define MESSAGESDATABASE_H
+
 #include <QtSQL>
+#include <string>
+
 
 
 struct Message
 {
-    std::string text;
+    QString text;
     bool isMyMessage;
     int timestamp;
 

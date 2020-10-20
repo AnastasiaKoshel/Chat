@@ -1,9 +1,11 @@
 #ifndef NEWACCOUNT_H
 #define NEWACCOUNT_H
 
+#include <string>
 #include <QDialog>
-#include "client.h"
+#include "messageparser.h"
 #include "dialog.h"
+
 
 namespace Ui {
 class NewAccount;
@@ -14,20 +16,20 @@ class NewAccount: public QDialog
     Q_OBJECT
 
 public:
-    explicit NewAccount(Client *cl, QWidget *parent = nullptr);
+    explicit NewAccount(MessageParser *msParser, QWidget *parent = nullptr);
     ~NewAccount();
 
 
 signals:
-    void createNewAccountSuccess();
+    void createNewAccountSuccess(const QString& login);
 
 private slots:
-    void newAccountSignalReceived(std::string status);
+    void newAccountSignalReceived(const QString& status);
     void on_okButton_clicked();
 
 private:
-    Ui::NewAccount *ui;
-    Client *client;
+    std::unique_ptr<Ui::NewAccount> ui;
+    MessageParser *messageParser;
 
 };
 

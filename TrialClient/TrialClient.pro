@@ -1,22 +1,26 @@
-QT += network widgets\
+QT += network widgets \
     core sql
 requires(qtConfig(combobox))
 
+QMAKE_CXXFLAGS += /std:c++17
+
 HEADERS       = client.h \
     dialog.h \
+    jsonType.h \
     login.h \
     mainwidget.h \
-    newaccount.h
+    messageparser.h \
+    newaccount.h \
+    messagesdatabase.h
 SOURCES       = client.cpp \
                 dialog.cpp \
                 login.cpp \
                 main.cpp \
                 mainwidget.cpp \
-                newaccount.cpp
+                messageparser.cpp \
+                newaccount.cpp \
+                messagesdatabase.cpp
 
-# install
-target.path = $$[QT_INSTALL_EXAMPLES]/network/fortuneclient
-INSTALLS += target
 
 FORMS += \
     dialog.ui \

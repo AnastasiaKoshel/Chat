@@ -8,10 +8,12 @@ class DBManager
 public:
     DBManager();
     const QString path = "C:/Users/Anastasiia_Koshel/SQlite/clientData.db";
-    bool addClient(std::string login, std::string password);
-    int getIDbyLogin(std::string login);
-    bool loginAndPasswordMatch(std::string login, std::string password);
-    std::vector<std::string> getAllUsers();
+    bool addClient(const QString& login, QString password);
+    int getIDbyLogin(const QString& login);
+    bool loginAndPasswordMatch(const QString& login, const QString& password);
+    std::vector<QString> getAllUsers();
+    QString decryptPassword(QString password);
+    QString encryptPassword(QString password);
 
 
 private:

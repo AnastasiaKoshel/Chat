@@ -1,16 +1,18 @@
 #include "dialog.h"
 #include "ui_dialog.h"
 
-Dialog::Dialog(Client *cl, QJsonArray usersArray, QWidget *parent) :
+
+Dialog::Dialog(MessageParser *msParser, QJsonArray usersArray, QString login, QWidget *parent) :
     QDialog(parent),
-    ui(new Ui::Dialog),
-    client(cl),
-    usersList(usersArray)
+    messageParser(msParser),
+    usersList(usersArray),
+    login(login)
 {
+    ui = new Ui::Dialog();
     ui->setupUi(this);
     db = std::make_unique<MessagesDataBase>();
 
-    ui->titleLabel->setText(cl->getLogin().c_str());
+    ui->titleLabel->setText(login);
     for(auto user : usersArray)
     {
         ui->listWidget->addItem(user.toString());
@@ -18,8 +20,9 @@ Dialog::Dialog(Client *cl, QJsonArray usersArray, QWidget *parent) :
     }
 
 
-    connect(client, SIGNAL(processMessageSignal(std::string, std::string)), this, SLOT(displayMessage(std::string, std::string)));
-    connect(client, SIGNAL(userIdbyLoginSignal(int, int)), this, SLOT(displayChat(int, int)));
+    connect(messageParser, SIGNAL(processMessageSignal(const QString&, const QString&)),
+            this, SLOT(displayMessage(const QString&, const QString&)));
+    connect(messageParser, SIGNAL(userIdbyLoginSignal(const int, const int)), this, SLOT(displayChat(const int, const int)));
 }
 
 Dialog::~Dialog()
@@ -30,21 +33,23 @@ Dialog::~Dialog()
 void Dialog::on_sendButton_clicked()
 {
     QString message = ui->textEdit->toPlainText();
-    client->sendTextMessage(message.toStdString());
-    message = ui->labelYourMessage->text() + '\n'+ message;
-    ui->labelYourMessage->setText(message);
+    if(!message.isEmpty())
+        messageParser->sendTextMessage(message, login, chatLogin);
+
+    QListWidgetItem* item = new QListWidgetItem(message);
+    item->setTextAlignment(Qt::AlignRight);
+    ui->messagesWidget->addItem(item);
     ui->textEdit->clear();
 }
 
-void Dialog::displayMessage(std::string message, std::string recipientLogin)
+void Dialog::displayMessage(const QString& message, const QString& senderLogin)
 {
-    qDebug()<<"curChatLogin "<<client->getLogin().c_str()<<" recipient Login "<<recipientLogin.c_str();
-    if(client->getLogin() == recipientLogin)
+    qDebug()<<"curChatLogin "<<chatLogin<<" recipient Login "<<senderLogin;
+    if(chatLogin == senderLogin)
     {
-        std::string curMessage = ui->label->text().toStdString();
-        curMessage += "\n";
-        curMessage += message;
-        ui->label->setText(curMessage.c_str());
+        QListWidgetItem* item = new QListWidgetItem(message);
+        item->setTextAlignment(Qt::AlignLeft);
+        ui->messagesWidget->addItem(item);
     }
 }
 
@@ -53,34 +58,44 @@ void Dialog::on_listWidget_itemClicked(QListWidgetItem *item)
 {
     qDebug()<< "Clicked on list widget item and login is "<<item->text();
 
-    client->setCurrentChatLogin(item->text().toStdString());
-    client->getSelectedChat();
-     qDebug()<<item->text();
-   // displayChat();
+    chatLogin = item->text();
+    messageParser->getSelectedChat(login, chatLogin);
+    qDebug()<<item->text();
+
 }
 
-void Dialog::displayChat(int myId, int otherId)
+void Dialog::displayChat(const int myId, const int otherId)
 {
+    ui->messagesWidget->clear();
     std::vector<Message> messageHistory = db->getMessageHistory(myId, otherId);
-    std::string myMessageText="";
-    std::string otherMessageText="";
-
+    QString myMessageText="";
+    QString otherMessageText="";
+    //const QString& image = "C:/Users/Anastasiia_Koshel/Documents/Chat/TrialClient/you.png";
+    //QIcon icon("C:/Users/Anastasiia_Koshel/Documents/Chat/TrialClient/you.png");
     for(Message curMessage : messageHistory)
     {
-        if(curMessage.isMyMessage && !curMessage.text.empty())
+        if(!curMessage.text.isEmpty())
         {
-            myMessageText += (curMessage.text + "\n");
-            otherMessageText += "\n";
-        }
-        else
-        {
-            otherMessageText += (curMessage.text  + "\n");
-            myMessageText += "\n";
+            QListWidgetItem* item = new QListWidgetItem(curMessage.text);
+            if(curMessage.isMyMessage)
+            {
+                 item->setTextAlignment(Qt::AlignRight|Qt::AlignRight);
+                 //item->setIcon(icon);
+            }
+
+            else
+                item->setTextAlignment(Qt::AlignLeft);
+            ui->messagesWidget->addItem(item);
         }
 
     }
-    qDebug()<<"My messages "<<myMessageText.c_str();
-    ui->labelYourMessage->setText(myMessageText.c_str());
-    qDebug()<<"Other messages "<<myMessageText.c_str();
-    ui->label->setText(otherMessageText.c_str());
+}
+
+
+
+void Dialog::on_uploadButton_clicked()
+{
+    QString filePath = QFileDialog::getOpenFileName(this, "open a file", "C:/");
+    qDebug()<<"File path"<< filePath;
+    messageParser->sendFileMessage(filePath, login, chatLogin);
 }
