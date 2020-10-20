@@ -1,8 +1,8 @@
 QT += network widgets \
     core sql
-requires(qtConfig(combobox))
 
-QMAKE_CXXFLAGS += /std:c++17
+
+#QMAKE_CXXFLAGS += /std:c++17
 
 HEADERS       = client.h \
     dialog.h \
@@ -12,6 +12,7 @@ HEADERS       = client.h \
     messageparser.h \
     newaccount.h \
     messagesdatabase.h
+
 SOURCES       = client.cpp \
                 dialog.cpp \
                 login.cpp \

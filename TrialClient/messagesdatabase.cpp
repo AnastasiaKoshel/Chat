@@ -14,10 +14,22 @@ MessagesDataBase::MessagesDataBase()
        qDebug() << "Database: connection ok";
     }
 }
+void writeCurrentMessageToVector(QSqlQuery& query, std::vector<Message>& messageHistory, bool isMyMessage)
+{
+    Message currentMessage;
+    while(query.next())
+    {
+        currentMessage.text = query.value(3).toString();
+        currentMessage.timestamp = query.value(4).toInt();
+        currentMessage.isMyMessage = isMyMessage;
+        messageHistory.push_back(currentMessage);
+        qDebug() << "My mess "<<currentMessage.text;
 
+    }
+}
 std::vector<Message> MessagesDataBase::getMessageHistory(const int myID, const int otherID)
 {
-    std::vector<Message> messageHistory;
+    std::vector<Message> messageHistory(1000);
     //reserve space for vector probably we know number of messages
     Message currentMessage;
     QSqlQuery query(messagesDB);
@@ -29,15 +41,7 @@ std::vector<Message> MessagesDataBase::getMessageHistory(const int myID, const i
         qDebug() << "Error getting message history info from DB";
         return messageHistory;
     }
-    while(query.next())
-    {
-        currentMessage.text = query.value(3).toString();
-        currentMessage.timestamp = query.value(4).toInt();
-        currentMessage.isMyMessage = true;
-        messageHistory.push_back(currentMessage);
-        qDebug() << "My mess "<<currentMessage.text;
-
-    }
+    writeCurrentMessageToVector(query, messageHistory, true );
 
     query.prepare("SELECT * FROM messageData WHERE sender = (:receiver) AND receiver = (:sender)");
     query.bindValue(":sender", myID);
@@ -47,15 +51,8 @@ std::vector<Message> MessagesDataBase::getMessageHistory(const int myID, const i
         qDebug() << "Error getting message history2 info from DB";
         return messageHistory;
     }
-    while(query.next())
-    {
-        currentMessage.text = query.value(3).toString(); //add name of column to select
-        currentMessage.timestamp = query.value(4).toInt();
-        currentMessage.isMyMessage = false;
-        messageHistory.push_back(currentMessage);
-        qDebug() << "Other mess "<<currentMessage.text; //probably add QString
+    writeCurrentMessageToVector(query, messageHistory, false );
 
-    }
     sort(messageHistory.begin(), messageHistory.end(),
         [](const Message& a, const Message& b)
     {
@@ -64,3 +61,4 @@ std::vector<Message> MessagesDataBase::getMessageHistory(const int myID, const i
 
     return messageHistory;
 }
+

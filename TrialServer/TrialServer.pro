@@ -15,9 +15,7 @@ SOURCES       = dialog.cpp \
                 main.cpp \
                 messagesdbmanager.cpp
 
-# install
-target.path = $$[QT_INSTALL_EXAMPLES]/network/fortuneserver
-INSTALLS += target
-
 FORMS += \
     dialog.ui
+
+CONFIG += release
