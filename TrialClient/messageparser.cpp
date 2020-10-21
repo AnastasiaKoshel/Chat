@@ -36,10 +36,13 @@ void MessageParser::sendFileMessage(QString & filePath, const QString& login, co
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             qDebug() << "[MessageParser] Error reading file";
 
+    QFileInfo fileInfo(file.fileName());
+    QString filename(fileInfo.fileName());
     QJsonObject fileJson;
 
     QByteArray array = file.readAll();
     fileJson["type"] = JSONType::FILE_MESSAGE;
+    fileJson["fileName"] = filename;
     fileJson["value"] = array.data();
         qDebug()<<"[MessageParser] file type "<<fileJson["type"];
         qDebug()<<"[MessageParser] file "<<array.data();
@@ -117,7 +120,7 @@ void MessageParser::processJson(QJsonObject& object)
                                       object.value("senderLogin").toString());
             break;
         case FILE_MESSAGE:
-            emit processFileMessageSignal(object.value("value").toString());
+            emit processFileMessageSignal(object.value("fileName").toString(), object.value("value").toString());
             break;
     }
 

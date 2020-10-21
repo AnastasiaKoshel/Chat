@@ -156,7 +156,8 @@ void MessageParser::processFile(const QJsonObject& json, const std::vector<Clien
     messagesDB->writeMessageToDB(file, passwordLoginDB->getIDbyLogin(senderLogin),passwordLoginDB->getIDbyLogin(recipientLogin));
 
     QJsonObject messageJson;
-    messageJson["type"] = JSONType::MESSAGE;
+    messageJson["type"] = JSONType::FILE_MESSAGE;
+    messageJson["fileName"] = json.value("fileName").toString();
     messageJson["value"] = file;
     qDebug()<<"[MessageParser] file"<<file;
     messageJson["senderLogin"] = senderLogin;

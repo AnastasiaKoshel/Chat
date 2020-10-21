@@ -29,6 +29,7 @@ private slots:
     void on_sendButton_clicked();
     void displayMessage(const QString& message, const QString& senderLogin);
     void displayChat(const int myId, const int otherId);
+    void displayFile(const QString& fileName, const QString& fileString);
     void on_listWidget_itemClicked(QListWidgetItem *item);
 
 
@@ -42,6 +43,8 @@ private:
     QString login;
     QString chatLogin;
     bool isFileUploaded = false;
+    QIcon* fileIcon = new QIcon("C:/Users/Anastasiia_Koshel/Documents/Chat/fileIcon.png");
+    QString fileIconPath = "C:/Users/Anastasiia_Koshel/Documents/Chat/fileIcon.png";
 };
 
 #endif // DIALOG_H

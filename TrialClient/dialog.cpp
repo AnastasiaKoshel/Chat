@@ -23,6 +23,8 @@ Dialog::Dialog(MessageParser *msParser, QJsonArray usersArray, QString login, QW
     connect(messageParser, SIGNAL(processMessageSignal(const QString&, const QString&)),
             this, SLOT(displayMessage(const QString&, const QString&)));
     connect(messageParser, SIGNAL(userIdbyLoginSignal(const int, const int)), this, SLOT(displayChat(const int, const int)));
+
+    connect(messageParser, SIGNAL(processFileMessageSignal(const QString&, const QString&)), this, SLOT(displayFile(const QString&, const QString&)));
 }
 
 Dialog::~Dialog()
@@ -87,15 +89,25 @@ void Dialog::displayChat(const int myId, const int otherId)
                 item->setTextAlignment(Qt::AlignLeft);
             ui->messagesWidget->addItem(item);
         }
-
     }
 }
 
-
+void Dialog::displayFile(const QString& fileName, const QString& fileString)
+{
+    QListWidgetItem* item = new QListWidgetItem(*fileIcon, fileName);
+    item->setTextAlignment(Qt::AlignLeft);
+    ui->messagesWidget->addItem(item);
+}
 
 void Dialog::on_uploadButton_clicked()
 {
     QString filePath = QFileDialog::getOpenFileName(this, "open a file", "C:/");
     qDebug()<<"File path"<< filePath;
     messageParser->sendFileMessage(filePath, login, chatLogin);
+
+    QFileInfo fileInfo(filePath);
+    QString fileName(fileInfo.fileName());
+    QListWidgetItem* item = new QListWidgetItem(*fileIcon, fileName);
+    item->setTextAlignment(Qt::AlignRight);
+    ui->messagesWidget->addItem(item);
 }

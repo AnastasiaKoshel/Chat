@@ -23,7 +23,7 @@ public:
 
 signals:
     void processMessageSignal(const QString& message, const QString& recipientLogin);
-    void processFileMessageSignal(const QString& file);
+    void processFileMessageSignal(const QString& fileName, const QString& file);
     void loginJsonSignal(const QString& status);
     void newAccountSignal(const QString& status);
     void userListReceived(const QJsonArray& usersArray);
