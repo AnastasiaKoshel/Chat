@@ -18,6 +18,7 @@ public:
     void sendNewAccountMessage(const QString& login, const QString& password);
     void requestAllUsers();
     void getSelectedChat(const QString& login, const QString& chatLogin);
+    const QString pathToSaveFiles = "C:/Users/Anastasiia_Koshel/Documents/Chat/";
 
 
 
@@ -30,9 +31,11 @@ signals:
     void userIdbyLoginSignal(const int myId, const int otherId);
     void sendJSON(QJsonObject& json);
     void sendFile(QFile& file);
+    void fileSavedSignal(const QString& filePath);
 
 public slots:
     void processJson(QJsonObject& object);
+    void saveFile(const QString& fileName, const QString& file);
 
 };
 

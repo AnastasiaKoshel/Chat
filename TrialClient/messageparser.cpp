@@ -9,6 +9,7 @@ MessageParser::MessageParser(QObject *parent)
     client->connectToServer();
     connect(client, SIGNAL(jsonReceived(QJsonObject&)), this, SLOT(processJson(QJsonObject&)));
     connect(this, SIGNAL(sendJSON(QJsonObject&)), client, SLOT(sendJSON(QJsonObject&)));
+    connect(this, SIGNAL(processFileMessageSignal(const QString&, const QString&)), this, SLOT(saveFile(const QString&, const QString&)));
 }
 
 std::size_t hashPassword(QString password)
@@ -128,3 +129,14 @@ void MessageParser::processJson(QJsonObject& object)
     //TODO::add error
 }
 
+void MessageParser::saveFile(const QString& fileName, const QString& fileContent)
+{
+    const QString filePath = pathToSaveFiles+fileName;
+    QFile file(filePath);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
+            return;
+    QTextStream out(&file);
+    out<<fileContent;
+    qDebug()<<"[MessageParser] Saved File with name "<<filePath;
+    emit fileSavedSignal(filePath);
+}

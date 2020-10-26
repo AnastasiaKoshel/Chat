@@ -1,6 +1,6 @@
 #include "dialog.h"
 #include "ui_dialog.h"
-
+#include <QDesktopServices>
 
 Dialog::Dialog(MessageParser *msParser, QJsonArray usersArray, QString login, QWidget *parent) :
     QDialog(parent),
@@ -24,7 +24,7 @@ Dialog::Dialog(MessageParser *msParser, QJsonArray usersArray, QString login, QW
             this, SLOT(displayMessage(const QString&, const QString&)));
     connect(messageParser, SIGNAL(userIdbyLoginSignal(const int, const int)), this, SLOT(displayChat(const int, const int)));
 
-    connect(messageParser, SIGNAL(processFileMessageSignal(const QString&, const QString&)), this, SLOT(displayFile(const QString&, const QString&)));
+    connect(messageParser, SIGNAL(fileSavedSignal(const QString&)), this, SLOT(displayFile(const QString&)));
 }
 
 Dialog::~Dialog()
@@ -92,11 +92,14 @@ void Dialog::displayChat(const int myId, const int otherId)
     }
 }
 
-void Dialog::displayFile(const QString& fileName, const QString& fileString)
+void Dialog::displayFile(const QString& filePath)
 {
+    QFileInfo fileInfo(filePath);
+    QString fileName(fileInfo.fileName());
     QListWidgetItem* item = new QListWidgetItem(*fileIcon, fileName);
     item->setTextAlignment(Qt::AlignLeft);
     ui->messagesWidget->addItem(item);
+    filesWidgetList.emplace(std::make_pair(item, filePath));
 }
 
 void Dialog::on_uploadButton_clicked()
@@ -110,4 +113,15 @@ void Dialog::on_uploadButton_clicked()
     QListWidgetItem* item = new QListWidgetItem(*fileIcon, fileName);
     item->setTextAlignment(Qt::AlignRight);
     ui->messagesWidget->addItem(item);
+
+    filesWidgetList.emplace(std::make_pair(item, filePath));
+}
+
+void Dialog::on_messagesWidget_itemDoubleClicked(QListWidgetItem *item)
+{
+    auto search = filesWidgetList.find(item);
+    if(search == filesWidgetList.end())
+        return;
+
+    QDesktopServices::openUrl(QUrl::fromLocalFile(search->second));
 }
