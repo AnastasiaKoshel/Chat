@@ -3,6 +3,7 @@
 
 #include <string>
 #include "client.h"
+#include "filemanager.h"
 
 class MessageParser : public QObject
 {
@@ -11,6 +12,7 @@ class MessageParser : public QObject
 public:
     MessageParser(QObject  *parent = nullptr);
     Client *client;
+    std::unique_ptr<FileManager> fileManager;
 
     void sendTextMessage(const QString& text, const QString& login, const QString& chatLogin);
     void sendFileMessage(QString & filePath, const QString& login, const QString& chatLogin);
@@ -18,24 +20,26 @@ public:
     void sendNewAccountMessage(const QString& login, const QString& password);
     void requestAllUsers();
     void getSelectedChat(const QString& login, const QString& chatLogin);
-    const QString pathToSaveFiles = "C:/Users/Anastasiia_Koshel/Documents/Chat/";
+
 
 
 
 signals:
     void processMessageSignal(const QString& message, const QString& recipientLogin);
-    void processFileMessageSignal(const QString& fileName, const QString& file);
+    void processFileMessageSignal(const int size, const QString& fileName, const QString& file);
     void loginJsonSignal(const QString& status);
     void newAccountSignal(const QString& status);
     void userListReceived(const QJsonArray& usersArray);
     void userIdbyLoginSignal(const int myId, const int otherId);
     void sendJSON(QJsonObject& json);
-    void sendFile(QFile& file);
+    void sendFile(QByteArray& file);
     void fileSavedSignal(const QString& filePath);
+    void receivingFileSignal();
 
 public slots:
     void processJson(QJsonObject& object);
-    void saveFile(const QString& fileName, const QString& file);
+    void processFile(const int size, const QString& fileName, const QString& senderLogin);
+    void receivedFileData(QByteArray& data);
 
 };
 

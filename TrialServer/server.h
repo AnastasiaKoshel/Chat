@@ -32,14 +32,14 @@ public:
     void initClient();
 
 private slots:
-    void jsonReceived();
+    void messageReceived();
     void deleteUser();
 
 signals:
     void processMessageSignal(QString s);
 
 private:
-    void messageReceived(const QJsonObject& json);
+    //void messageReceived(const QJsonObject& json);
 
     std::unique_ptr<QTcpServer> tcpServer;
     std::vector<ClientData*> clients;

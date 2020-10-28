@@ -165,8 +165,7 @@ void MessageParser::processFile(const QJsonObject& json, QTcpSocket* sender, con
     //TODO: rewrite this
     fileManager = std::make_unique<FileManager>(/*sender,*/recepient, json.value("size").toInt(),
                                                 json.value("senderLogin").toString(), json.value("fileName").toString());
-    //connect(fileManager.get(), SIGNAL(sendFileSignal(QByteArray&)),
-     //       this, SLOT(sendFileToServer(QByteArray&)));
+
 }
 void MessageParser::passFileData(QByteArray& data)
 {

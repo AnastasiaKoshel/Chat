@@ -6,6 +6,7 @@ QT += network widgets \
 
 HEADERS       = client.h \
     dialog.h \
+    filemanager.h \
     jsonType.h \
     login.h \
     mainwidget.h \
@@ -15,6 +16,7 @@ HEADERS       = client.h \
 
 SOURCES       = client.cpp \
                 dialog.cpp \
+                filemanager.cpp \
                 login.cpp \
                 main.cpp \
                 mainwidget.cpp \

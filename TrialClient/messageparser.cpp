@@ -2,6 +2,7 @@
 #include "jsonType.h"
 #include <string>
 
+
 MessageParser::MessageParser(QObject *parent)
     : QObject(parent),
     client(new Client())
@@ -9,7 +10,9 @@ MessageParser::MessageParser(QObject *parent)
     client->connectToServer();
     connect(client, SIGNAL(jsonReceived(QJsonObject&)), this, SLOT(processJson(QJsonObject&)));
     connect(this, SIGNAL(sendJSON(QJsonObject&)), client, SLOT(sendJSON(QJsonObject&)));
-    connect(this, SIGNAL(processFileMessageSignal(const QString&, const QString&)), this, SLOT(saveFile(const QString&, const QString&)));
+    connect(this, SIGNAL(sendFile(QByteArray&)), client, SLOT(sendFileData(QByteArray&)));
+    connect(client, SIGNAL(fileDataReceived(QByteArray&)), this, SLOT(receivedFileData(QByteArray&)));
+    connect(this, SIGNAL(processFileMessageSignal(const int, const QString&, const QString&)), this, SLOT(processFile(const int , const QString&, const QString&)));
 }
 
 std::size_t hashPassword(QString password)
@@ -34,7 +37,7 @@ void MessageParser::sendFileMessage(QString & filePath, const QString& login, co
 {
     qDebug() << "Send file message";
     QFile file(filePath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    if (!file.open(QIODevice::ReadOnly))
             qDebug() << "[MessageParser] Error reading file";
 
     QFileInfo fileInfo(file.fileName());
@@ -44,13 +47,15 @@ void MessageParser::sendFileMessage(QString & filePath, const QString& login, co
     QByteArray array = file.readAll();
     fileJson["type"] = JSONType::FILE_MESSAGE;
     fileJson["fileName"] = filename;
-    fileJson["value"] = array.data();
+    fileJson["size"] = array.size();
         qDebug()<<"[MessageParser] file type "<<fileJson["type"];
         qDebug()<<"[MessageParser] file "<<array.data();
     fileJson["recipientLogin"] = chatLogin;
     fileJson["senderLogin"] = login;
 
     emit sendJSON(fileJson);
+    qDebug()<<"Sending data of size = "<<array.size();
+    emit sendFile(array);
 }
 
 void MessageParser::sendLoginMessage(const QString& login, const QString& password)
@@ -121,7 +126,7 @@ void MessageParser::processJson(QJsonObject& object)
                                       object.value("senderLogin").toString());
             break;
         case FILE_MESSAGE:
-            emit processFileMessageSignal(object.value("fileName").toString(), object.value("value").toString());
+            emit processFileMessageSignal(object.value("size").toInt(), object.value("fileName").toString(), object.value("senderLogin").toString());
             break;
     }
 
@@ -129,14 +134,13 @@ void MessageParser::processJson(QJsonObject& object)
     //TODO::add error
 }
 
-void MessageParser::saveFile(const QString& fileName, const QString& fileContent)
+void MessageParser::processFile(const int size, const QString& fileName, const QString& senderLogin)
 {
-    const QString filePath = pathToSaveFiles+fileName;
-    QFile file(filePath);
-    if (!file.open(QIODevice::WriteOnly | QIODevice::Text))
-            return;
-    QTextStream out(&file);
-    out<<fileContent;
-    qDebug()<<"[MessageParser] Saved File with name "<<filePath;
-    emit fileSavedSignal(filePath);
+    client->isFileTransmition = true;
+    fileManager = std::make_unique<FileManager>(client->tcpSocket.get(), size, senderLogin,fileName);
+}
+void MessageParser::receivedFileData(QByteArray& data)
+{
+    qDebug()<<"[MessageParser] receving file Data";
+    fileManager->receiveFileData(data);
 }

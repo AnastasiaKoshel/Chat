@@ -31,20 +31,24 @@ class Client : public QObject
 public:
     explicit Client(QObject  *parent = nullptr);
     void receiveJSON();
+    std::unique_ptr<QTcpSocket> tcpSocket;
+    bool isFileTransmition = false;
 
 signals:
     void disconnected();
     void jsonReceived(QJsonObject& object);
+    void fileDataReceived(QByteArray& data);
 
 
 public slots:
     void connectToServer();
     void displayError(QAbstractSocket::SocketError socketError);
     void sendJSON(QJsonObject& json);
+    void sendFileData(QByteArray& data);
 
 
 private:
-    std::unique_ptr<QTcpSocket> tcpSocket;
+
 
 };
 

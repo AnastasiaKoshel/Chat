@@ -46,6 +46,7 @@ void Server::initClient()
 }
 void Server::messageReceived()
 {
+    //TODO: rewrite this
     QTcpSocket *client = (QTcpSocket*)sender();
     QByteArray data = client->readAll();
     for (size_t i = 0; i < clients.size(); ++i)
