@@ -8,11 +8,7 @@
 #include <QBuffer>
 #include <QFileInfo>
 
-FileManager::FileManager(QTcpSocket* sender, int size, QString login, QString name):
-    senderSocket(sender),
-    totalSizeExpected(size),
-    senderLogin(login),
-    fileName(name)
+FileManager::FileManager()
 {
 
 }

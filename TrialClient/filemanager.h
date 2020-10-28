@@ -9,7 +9,7 @@ class FileManager: public QThread
     Q_OBJECT
 
 public:
-    FileManager(QTcpSocket* sender, int size, QString login, QString name);
+    FileManager();
     void start();
     QByteArray data;
     void saveFile(const QString& fileName, const QByteArray& fileContent);
@@ -17,18 +17,26 @@ public:
 
     void receiveFileData(QByteArray& curData);
 
-signals:
-    void fileReceivedSignal(QByteArray& fileData, QString fileName, QString senderLogin);
-    void fileSavedSignal(QString filePath);
-
-
-private:
+    //TIDI:write setters
     QTcpSocket* senderSocket;
     qintptr     senderSocketDesriptor;      ///< Incoming from server socket descriptor.
     int         totalSizeExpected;             ///< Max size of block socket able to recieved.
 
     QString fileName;
     QString senderLogin;
+
+signals:
+    void fileReceivedSignal(QByteArray& fileData, QString fileName, QString senderLogin);
+    void fileSavedSignal(QString filePath);
+
+
+private:
+    /*QTcpSocket* senderSocket;
+    qintptr     senderSocketDesriptor;      ///< Incoming from server socket descriptor.
+    int         totalSizeExpected;             ///< Max size of block socket able to recieved.
+
+    QString fileName;
+    QString senderLogin;*/
 };
 
 #endif // FILEMANAGER_H

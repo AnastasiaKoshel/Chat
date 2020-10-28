@@ -5,6 +5,7 @@ MessageParser::MessageParser()
 {
     passwordLoginDB = std::make_unique<DBManager>();
     messagesDB = std::make_unique<MessagesDBManager>();
+    fileManager = std::make_unique<FileManager>();
 
 }
 
@@ -150,10 +151,8 @@ void MessageParser::processMessage(const QJsonObject& json, const std::vector<Cl
 void MessageParser::processFile(const QJsonObject& json, QTcpSocket* sender, const std::vector<ClientData*>&clients)
 {
     qDebug()<<"File json";
-    const QString file = json.value("value").toString();
-    const QString senderLogin = json.value("senderLogin").toString();
     const QString recipientLogin = json.value("recipientLogin").toString();
-    QTcpSocket* recepient; //TODO: fix this
+    QTcpSocket* recepient;
     foreach(ClientData* clientCur, clients)
     {
         if(clientCur->login == recipientLogin)
@@ -162,11 +161,12 @@ void MessageParser::processFile(const QJsonObject& json, QTcpSocket* sender, con
             //emit processMessageSignal(message);
         }
     }
-    //TODO: rewrite this
-    fileManager = std::make_unique<FileManager>(/*sender,*/recepient, json.value("size").toInt(),
-                                                json.value("senderLogin").toString(), json.value("fileName").toString());
-    //connect(fileManager.get(), SIGNAL(sendFileSignal(QByteArray&)),
-     //       this, SLOT(sendFileToServer(QByteArray&)));
+
+    fileManager->receipientSocket = recepient;
+    fileManager->totalSizeExpected = json.value("size").toInt();
+    fileManager->senderLogin = json.value("senderLogin").toString();
+    fileManager->fileName = json.value("fileName").toString();
+
 }
 void MessageParser::passFileData(QByteArray& data)
 {

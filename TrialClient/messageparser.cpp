@@ -8,6 +8,7 @@ MessageParser::MessageParser(QObject *parent)
     client(new Client())
 {
     client->connectToServer();
+    fileManager = std::make_unique<FileManager>();
     connect(client, SIGNAL(jsonReceived(QJsonObject&)), this, SLOT(processJson(QJsonObject&)));
     connect(this, SIGNAL(sendJSON(QJsonObject&)), client, SLOT(sendJSON(QJsonObject&)));
     connect(this, SIGNAL(sendFile(QByteArray&)), client, SLOT(sendFileData(QByteArray&)));
@@ -49,7 +50,7 @@ void MessageParser::sendFileMessage(QString & filePath, const QString& login, co
     fileJson["fileName"] = filename;
     fileJson["size"] = array.size();
         qDebug()<<"[MessageParser] file type "<<fileJson["type"];
-        qDebug()<<"[MessageParser] file "<<array.data();
+        //qDebug()<<"[MessageParser] file "<<array.data();
     fileJson["recipientLogin"] = chatLogin;
     fileJson["senderLogin"] = login;
 
@@ -137,7 +138,10 @@ void MessageParser::processJson(QJsonObject& object)
 void MessageParser::processFile(const int size, const QString& fileName, const QString& senderLogin)
 {
     client->isFileTransmition = true;
-    fileManager = std::make_unique<FileManager>(client->tcpSocket.get(), size, senderLogin,fileName);
+    fileManager->senderSocket = client->tcpSocket.get();
+    fileManager->totalSizeExpected = size;
+    fileManager->senderLogin = senderLogin;
+    fileManager->fileName = fileName;
 }
 void MessageParser::receivedFileData(QByteArray& data)
 {

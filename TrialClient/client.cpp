@@ -52,12 +52,6 @@ void Client::sendFileData(QByteArray& data)
     tcpSocket->write(data);
 }
 
-//void Client::sendMessage(QFile& file)
-//{
-//    const QByteArray fileData = file.readAll();
-//    tcpSocket->write(fileData);
-//}
-
 //errors will be handeled later
 void Client::displayError(QAbstractSocket::SocketError socketError)
 {

@@ -3,12 +3,7 @@
 #include <QJsonDocument>
 #include "jsonType.h"
 
-FileManager::FileManager(/*QTcpSocket* sender,*/ QTcpSocket* receiver, int size, QString login, QString name):
-    //senderSocket(sender),
-    receipientSocket(receiver),
-    totalSizeExpected(size),
-    senderLogin(login),
-    fileName(name)
+FileManager::FileManager()
 {
 
 }
