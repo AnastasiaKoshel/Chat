@@ -40,6 +40,7 @@ public slots:
     void processJson(QJsonObject& object);
     void processFile(const int size, const QString& fileName, const QString& senderLogin);
     void receivedFileData(QByteArray& data);
+    void fileSavedSlot(const QString& filePath);
 
 };
 

@@ -26,7 +26,6 @@ void FileManager::receiveFileData(QByteArray& curData)
 }
 void FileManager::saveFile(const QString& fileName,  const QByteArray& fileContent)
 {
-
     const QString filePath = pathToSaveFiles+fileName;
 
     QFileInfo fi(filePath);

@@ -14,6 +14,7 @@ MessageParser::MessageParser(QObject *parent)
     connect(this, SIGNAL(sendFile(QByteArray&)), client, SLOT(sendFileData(QByteArray&)));
     connect(client, SIGNAL(fileDataReceived(QByteArray&)), this, SLOT(receivedFileData(QByteArray&)));
     connect(this, SIGNAL(processFileMessageSignal(const int, const QString&, const QString&)), this, SLOT(processFile(const int , const QString&, const QString&)));
+    connect(fileManager.get(), SIGNAL(fileSavedSignal(const QString&)), this, SLOT(fileSavedSlot(const QString&)));
 }
 
 std::size_t hashPassword(QString password)
@@ -147,4 +148,9 @@ void MessageParser::receivedFileData(QByteArray& data)
 {
     qDebug()<<"[MessageParser] receving file Data";
     fileManager->receiveFileData(data);
+}
+
+void MessageParser::fileSavedSlot(const QString& filePath)
+{
+    emit fileSavedSignal(filePath);
 }
