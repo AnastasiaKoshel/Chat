@@ -96,6 +96,7 @@ void Dialog::displayFile(const QString& filePath)
 {
     QFileInfo fileInfo(filePath);
     QString fileName(fileInfo.fileName());
+    //TODO: move to func
     QListWidgetItem* item = new QListWidgetItem(*fileIcon, fileName);
     item->setTextAlignment(Qt::AlignLeft);
     ui->messagesWidget->addItem(item);
@@ -104,6 +105,7 @@ void Dialog::displayFile(const QString& filePath)
 
 void Dialog::on_uploadButton_clicked()
 {
+    //TODO: handle empty file path
     QString filePath = QFileDialog::getOpenFileName(this, "open a file", "C:/");
     qDebug()<<"File path"<< filePath;
     messageParser->sendFileMessage(filePath, login, chatLogin);
@@ -114,7 +116,7 @@ void Dialog::on_uploadButton_clicked()
     item->setTextAlignment(Qt::AlignRight);
     ui->messagesWidget->addItem(item);
 
-    filesWidgetList.emplace(std::make_pair(item, filePath));
+    filesWidgetList.emplace(item, filePath);
 }
 
 void Dialog::on_messagesWidget_itemDoubleClicked(QListWidgetItem *item)

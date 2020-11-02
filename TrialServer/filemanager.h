@@ -10,19 +10,22 @@ class FileManager: public QThread
 
 public:
     FileManager();
-    QByteArray data;
+
     void sendFileJSON();
     void getFileData(QByteArray& curData);
 
-    //TODO: write setters and getters
-    QTcpSocket* senderSocket;
-    QTcpSocket* receipientSocket;
-    qintptr     senderSocketDesriptor;      ///< Incoming from server socket descriptor.
-    qintptr     receiverSocketDesriptor;      ///< Incoming from server socket descriptor.
-    int         totalSizeExpected;             ///< Max size of block socket able to recieved.
+    QTcpSocket* getReceipientSocket() { return receipientSocket; }
+    void setReceipientSocket(QTcpSocket* socket) {receipientSocket = socket;}
 
-    QString fileName;
-    QString senderLogin;
+    int getSizeExpected() {return totalSizeExpected;}
+    void setSizeExpected(int size){totalSizeExpected = size;}
+
+    QString getFileName(){return fileName;}
+    void setFileName(QString name){fileName = name;}
+
+    QString getSenderLogin(){return senderLogin;}
+    void setSenderLogin(QString login){senderLogin= login;}
+
 
 private slots:
     //void onReadyRead();
@@ -32,14 +35,11 @@ signals:
 
 
 private:
-    /*QTcpSocket* senderSocket;
     QTcpSocket* receipientSocket;
-    qintptr     senderSocketDesriptor;      ///< Incoming from server socket descriptor.
-    qintptr     receiverSocketDesriptor;      ///< Incoming from server socket descriptor.
-    int         totalSizeExpected;             ///< Max size of block socket able to recieved.
-
+    int         totalSizeExpected;
     QString fileName;
-    QString senderLogin;*/
+    QString senderLogin;
+    QByteArray data;
 };
 
 #endif // FILEMANAGER_H

@@ -30,7 +30,7 @@ void FileManager::saveFile(const QString& fileName,  const QByteArray& fileConte
 
     QFileInfo fi(filePath);
     QString ext = fi.completeSuffix();
-    if(ext == "PNG")
+    if(ext == "PNG") //TODO: add extentions
     {
         QImage image;
         image.loadFromData(fileContent);

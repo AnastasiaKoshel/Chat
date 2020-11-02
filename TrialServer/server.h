@@ -33,7 +33,7 @@ public:
 
 private slots:
     void messageReceived();
-    void deleteUser();
+    void removeUserFromList();
 
 signals:
     void processMessageSignal(QString s);
@@ -44,6 +44,8 @@ private:
     std::unique_ptr<QTcpServer> tcpServer;
     std::vector<ClientData*> clients;
     std::unique_ptr<MessageParser> parser;
+
+    std::map<int, std::shared_ptr<ClientData>> clientsDescriptorsMap;
 
 };
 

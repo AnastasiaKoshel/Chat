@@ -29,8 +29,7 @@ bool DBManager::addClient(const QString& login, QString password)
         return false;
 
     qDebug()<<"login = "<<login<<"password = "<<password;
-    bool success = false;
-    // TODO: you should check if args are ok first...
+
     QSqlQuery query(db);
     query.prepare(addClientQuery);
     query.bindValue(":login", login);
@@ -38,14 +37,13 @@ bool DBManager::addClient(const QString& login, QString password)
     query.bindValue(":id", 0);
     if(query.exec())
     {
-        success = true;
+        return true;
     }
-    else
-    {
-         qDebug() << "[DataBase] addPerson error:  "
-                  << query.lastError();
-    }
-    return success;
+
+    qDebug() << "[DataBase] addPerson error:  "
+             << query.lastError();
+
+    return false;
 }
 std::vector<QString> DBManager::getAllUsers()
 {

@@ -40,7 +40,10 @@ void MessageParser::sendFileMessage(QString & filePath, const QString& login, co
     qDebug() << "Send file message";
     QFile file(filePath);
     if (!file.open(QIODevice::ReadOnly))
+    {
             qDebug() << "[MessageParser] Error reading file";
+            return;
+    }
 
     QFileInfo fileInfo(file.fileName());
     QString filename(fileInfo.fileName());
@@ -57,6 +60,7 @@ void MessageParser::sendFileMessage(QString & filePath, const QString& login, co
 
     emit sendJSON(fileJson);
     qDebug()<<"Sending data of size = "<<array.size();
+    //TODO: split to blocks
     emit sendFile(array);
 }
 

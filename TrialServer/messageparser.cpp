@@ -1,5 +1,6 @@
 #include "messageparser.h"
 #include "jsonType.h"
+#include <utility>
 
 MessageParser::MessageParser()
 {
@@ -10,11 +11,12 @@ MessageParser::MessageParser()
 }
 
 
-void MessageParser::processJson(QJsonObject& object, QTcpSocket* client, const std::vector<ClientData*>& clients)
+void MessageParser::processJson(QJsonObject& object, QTcpSocket* client, const std::map<int, std::shared_ptr<ClientData>>& clients)
 {
     QJsonValue action = object.value("type");
     qDebug()<<"jSonType "<<action;
 
+    //TODO: patern command
     switch(JSONType(action.toInt()))
     {
         case LOGIN:
@@ -30,10 +32,10 @@ void MessageParser::processJson(QJsonObject& object, QTcpSocket* client, const s
             processUserIdbyLogin(object, client);
             break;
         case MESSAGE:
-            processMessage(object, clients);
+            processMessage(object);
             break;
         case FILE_MESSAGE:
-            processFile(object, client, clients);
+            processFile(object);
             break;
     }
 
@@ -44,84 +46,70 @@ void MessageParser::processUsersList(QTcpSocket* sender)
     messageJson["type"]=JSONType::USER_LIST;
     QJsonArray usersArray;
     std::vector<QString> usersVector = passwordLoginDB->getAllUsers();
-    for(auto user : usersVector )
+    for(const auto& user : usersVector )
     {
-         //QJsonObject userJson;
          usersArray.append(QJsonValue(user));
     }
     messageJson["userList"]=usersArray;
     const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
-    sender->write(jsonData);
 
+    sender->write(jsonData);
 }
-void MessageParser::processLogin(const QJsonObject& json,  QTcpSocket* sender, const std::vector<ClientData*>&clients)
+void MessageParser::processLogin(const QJsonObject& json,  QTcpSocket* sender, const std::map<int, std::shared_ptr<ClientData>>&clients)
 {
-    qDebug()<<"Login json";
-    const QJsonValue login = json.value("login");
-    const QJsonValue password = json.value("password");
-    qDebug()<<"Login" << login << " password"<<password;
+    const QString login = json.value("login").toString();
+    const QString password = json.value("password").toString();
+    qDebug()<<"[Message Parser] entered processLogin with login = "<< login << " and password = "<<password;
+
     const bool ifLoginMatchPassword =
-            passwordLoginDB->loginAndPasswordMatch(login.toString(), password.toString());
+            passwordLoginDB->loginAndPasswordMatch(login, password);
 
     QJsonObject messageJson;
     messageJson["type"] = JSONType::LOGIN;
-    if(ifLoginMatchPassword)
-        messageJson["status"] = "Success";
-    else
-        messageJson["status"] = "Fail";
+    messageJson["status"] = ifLoginMatchPassword ? "Success" : "Fail";
 
     const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
     sender->write(jsonData);
 
-
-    for(auto curClient : clients)
+    auto search = clients.find(sender->socketDescriptor());
+    if(search != clients.end())
     {
-        if(curClient->clientSocket->socketDescriptor() == sender->socketDescriptor())
-        {
-            curClient->login = login.toString();
-        }
+        search->second->login = login;
+        clientsLoginsMap.emplace(std::make_pair(login,std::weak_ptr<ClientData>(search->second)));
     }
-    //emit processMessageSignal("Login: " + login.toString().toStdString() + "  \nPassword: " + password.toString().toStdString());
-
 }
 
 
-void MessageParser::processNewAccount(const QJsonObject& json,  QTcpSocket* sender, const std::vector<ClientData*>&clients)
+void MessageParser::processNewAccount(const QJsonObject& json,  QTcpSocket* sender, const std::map<int, std::shared_ptr<ClientData>>&clients)
 {
     qDebug()<<"New Account json";
-    const QJsonValue login = json.value("login");
-    const QJsonValue password = json.value("password");
 
+    const QString login = json.value("login").toString();
+    const QString password = json.value("password").toString();
 
-    //TODO: emit signal
-    const int id = passwordLoginDB->getIDbyLogin(login.toString());
+    const int id = passwordLoginDB->getIDbyLogin(login);
 
     QJsonObject messageJson;
     messageJson["type"] = JSONType::NEW_ACCOUNT;
-    if(id)
+    messageJson["status"] = id ? "Fail" : "Success";
+    if(!id)
     {
-       messageJson["status"] = "Fail";
-    }
-    else
-    {
-       passwordLoginDB->addClient(login.toString(), password.toString());
-       messageJson["status"] = "Success";
-       //emit processMessageSignal("New Account has been created");
+       passwordLoginDB->addClient(login, password);
     }
 
     const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
     sender->write(jsonData);
 
-    for(auto curClient : clients)
+    auto search = clients.find(sender->socketDescriptor());
+    if(search != clients.end())
     {
-        if(curClient->clientSocket->socketDescriptor() == sender->socketDescriptor())
-        {
-            curClient->login = login.toString();
-        }
+        search->second->login = login;
+        std::weak_ptr<ClientData> clientData(search->second);
+        clientsLoginsMap.emplace(std::make_pair(login, clientData));
     }
 
 }
-void MessageParser::processMessage(const QJsonObject& json, const std::vector<ClientData*>&clients)
+void MessageParser::processMessage(const QJsonObject& json)
 {
     qDebug()<<"Message json";
     const QString message = json.value("value").toString();
@@ -136,36 +124,35 @@ void MessageParser::processMessage(const QJsonObject& json, const std::vector<Cl
     messageJson["senderLogin"] = senderLogin;
     const QByteArray jsonData = QJsonDocument(messageJson).toJson(QJsonDocument::Compact);
 
-    //const int recipient = json.value("recipientID").toInt();
-    foreach(ClientData* clientCur, clients)
+    auto search = clientsLoginsMap.find(recipientLogin);
+    if(search != clientsLoginsMap.end() && !(search->second.expired()))
     {
-        if(clientCur->login == recipientLogin)
-        {
-            clientCur->clientSocket->write(jsonData);
-            //emit processMessageSignal(message);
-        }
+        //std::shared_ptr<ClientData> cl(search->second);
+        //        cl->clientSocket->write(jsonData);
+        search->second.lock()->clientSocket->write(jsonData);
     }
-
 }
 
-void MessageParser::processFile(const QJsonObject& json, QTcpSocket* sender, const std::vector<ClientData*>&clients)
+void MessageParser::processFile(const QJsonObject& json)
 {
     qDebug()<<"File json";
     const QString recipientLogin = json.value("recipientLogin").toString();
     QTcpSocket* recepient;
-    foreach(ClientData* clientCur, clients)
-    {
-        if(clientCur->login == recipientLogin)
-        {
-            recepient = clientCur->clientSocket;
-            //emit processMessageSignal(message);
-        }
-    }
 
-    fileManager->receipientSocket = recepient;
-    fileManager->totalSizeExpected = json.value("size").toInt();
-    fileManager->senderLogin = json.value("senderLogin").toString();
-    fileManager->fileName = json.value("fileName").toString();
+    auto search = clientsLoginsMap.find(recipientLogin);
+    if(search != clientsLoginsMap.end() && !(search->second.expired()))
+    {
+        recepient = search->second.lock()->clientSocket;
+    }
+    if(!recepient)
+    {
+        //TODO: handle file sending if receiient is offline
+        return;
+    }
+    fileManager->setReceipientSocket(recepient);
+    fileManager->setSizeExpected (json.value("size").toInt());
+    fileManager->setSenderLogin (json.value("senderLogin").toString());
+    fileManager->setFileName(json.value("fileName").toString());
 
 }
 void MessageParser::passFileData(QByteArray& data)

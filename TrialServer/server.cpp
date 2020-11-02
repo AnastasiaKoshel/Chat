@@ -13,26 +13,23 @@ Server::Server(QObject *parent)
 
 bool Server::initServer()
 {
+    //TODO: think about this
     tcpServer = std::make_unique<QTcpServer>(this);
-    bool success = tcpServer->listen(QHostAddress::Any, 1234);
-    clients.reserve(1000);
-
-    connect(tcpServer.get(), &QTcpServer::newConnection, this, &Server::initClient);
-
-    parser = std::make_unique<MessageParser>();
-
-    if (!success) {
+    if (!tcpServer->listen(QHostAddress::Any, 1234))
+    {
         return false;
     }
+    connect(tcpServer.get(), &QTcpServer::newConnection, this, &Server::initClient);
+    parser = std::make_unique<MessageParser>();
+
     return true;
 }
 
 void Server::initClient()
 {
-    ClientData* client = new ClientData();
-    client->clientSocket = tcpServer->nextPendingConnection();
-    client->isFileTranmition = false;
-    clients.push_back(client);
+    auto client = std::make_shared<ClientData>(tcpServer->nextPendingConnection());
+
+    clientsDescriptorsMap.emplace(std::make_pair(client->clientSocket->socketDescriptor(), client));
 
     emit processMessageSignal("New client from:" + QString::number(client->clientSocket->socketDescriptor()));
     connect(client->clientSocket, &QIODevice::readyRead,
@@ -41,57 +38,41 @@ void Server::initClient()
     connect(client->clientSocket, &QAbstractSocket::disconnected,
             client->clientSocket, &QObject::deleteLater);
     connect(client->clientSocket, &QAbstractSocket::disconnected,
-            this, &Server::deleteUser);
+            this, &Server::removeUserFromList);
 
 }
 void Server::messageReceived()
 {
-    //TODO: rewrite this
-    QTcpSocket *client = (QTcpSocket*)sender();
+    QTcpSocket *client = dynamic_cast<QTcpSocket*>(sender());
     QByteArray data = client->readAll();
-    for (size_t i = 0; i < clients.size(); ++i)
+    auto search = clientsDescriptorsMap.find(client->socketDescriptor());
+    if(search != clientsDescriptorsMap.end())
     {
-        if(clients[i]->clientSocket->socketDescriptor() == client->socketDescriptor())
+        if(search->second->isFileTranmition)
         {
-            if(clients[i]->isFileTranmition)
-            {
-                qDebug()<<"Second File Message received";
-                parser->passFileData(data);
-                return;
-            }
+            qDebug()<<"Second File Message received";
+            parser->passFileData(data);
+            return;
         }
     }
 
     QJsonParseError parseError;
     const QJsonDocument json = QJsonDocument::fromJson(data, &parseError);
     QJsonObject jsonObject = json.object();
-    if(jsonObject.value("type")== JSONType::FILE_MESSAGE)
+    if(search != clientsDescriptorsMap.end() && jsonObject.value("type")== JSONType::FILE_MESSAGE)
     {
-        for (size_t i = 0; i < clients.size(); ++i)
-        {
-            if(clients[i]->clientSocket->socketDescriptor() == client->socketDescriptor())
-            {
-                qDebug()<<"File Message received";
-                clients[i]->isFileTranmition = true;
-            }
-        }
+        qDebug()<<"File Message received";
+        search->second->isFileTranmition = true;
     }
-
-    parser->processJson(jsonObject, client, clients);
-
+    parser->processJson(jsonObject, client, clientsDescriptorsMap);
 }
+//TODO: add hash_sum for file check
 
 
-
-void Server::deleteUser()
+void Server::removeUserFromList()
 {
-    qDebug()<<"clients array size ="<<clients.size();
-    for (size_t i = 0; i < clients.size(); ++i)
-    {
-        if(clients[i]->clientSocket->socketDescriptor() == ((QTcpSocket*)sender())->socketDescriptor())
-        {
-            clients.erase(clients.begin()+i);
-            return;
-        }
-    }
+    qDebug()<<"clients array size ="<<clientsDescriptorsMap.size();
+    size_t numOfErasedObjects = clientsDescriptorsMap.erase(dynamic_cast<QTcpSocket*>(sender())->socketDescriptor());
+    if(numOfErasedObjects>0)
+        qDebug()<<"Client was removed from map"<<clientsDescriptorsMap.size();
 }
