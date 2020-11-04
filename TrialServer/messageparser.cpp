@@ -144,7 +144,7 @@ void MessageParser::processFile(const QJsonObject& json)
     {
         recepient = search->second.lock()->clientSocket;
     }
-    if(!recepient)
+    else
     {
         //TODO: handle file sending if receiient is offline
         return;
@@ -153,6 +153,7 @@ void MessageParser::processFile(const QJsonObject& json)
     fileManager->setSizeExpected (json.value("size").toInt());
     fileManager->setSenderLogin (json.value("senderLogin").toString());
     fileManager->setFileName(json.value("fileName").toString());
+    fileManager->setCheckSum(json.value("checksum").toString());
 
 }
 void MessageParser::passFileData(QByteArray& data)

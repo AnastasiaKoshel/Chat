@@ -57,7 +57,8 @@ void MessageParser::sendFileMessage(QString & filePath, const QString& login, co
         //qDebug()<<"[MessageParser] file "<<array.data();
     fileJson["recipientLogin"] = chatLogin;
     fileJson["senderLogin"] = login;
-
+    fileJson["checksum"] = QString(QCryptographicHash::hash(array, QCryptographicHash::Md5).toHex());
+    qDebug()<<"[MessageParser]sendFileMessage, checksum = "<<fileJson["checksum"];
     emit sendJSON(fileJson);
     qDebug()<<"Sending data of size = "<<array.size();
     //TODO: split to blocks

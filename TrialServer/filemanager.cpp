@@ -2,6 +2,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include "jsonType.h"
+#include <QCryptographicHash>
 
 FileManager::FileManager()
 {
@@ -11,6 +12,14 @@ FileManager::FileManager()
 
 void FileManager::sendFileJSON()
 {
+    qDebug()<<"[FileManager] Send file with name" <<fileName;
+    QString sumOfReceivedFile = QString(QCryptographicHash::hash(data, QCryptographicHash::Md5).toHex());
+    qDebug()<<"[FileManager] check sum of received file = " <<sumOfReceivedFile<< " expected = "<<checksum;
+    if(sumOfReceivedFile != checksum)
+    {
+        qDebug()<<"File was received with deffets";
+        return;
+    }
     //TODO: emit signal to turn of file receive flag
     qDebug()<<"[FileManager] Send file with name" <<fileName;
     QJsonObject messageJson;

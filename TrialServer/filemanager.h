@@ -26,6 +26,8 @@ public:
     QString getSenderLogin(){return senderLogin;}
     void setSenderLogin(QString login){senderLogin= login;}
 
+    void setCheckSum(QString sum) {checksum = sum; }
+
 
 private slots:
     //void onReadyRead();
@@ -40,6 +42,7 @@ private:
     QString fileName;
     QString senderLogin;
     QByteArray data;
+    QString checksum;
 };
 
 #endif // FILEMANAGER_H
